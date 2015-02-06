@@ -12,6 +12,9 @@ public:
 	virtual bool islegal(int x, int y){
 		cout<<"Error: method for checking legality not found"<<endl;
 	}
+	virtual vector<move> getmoves(){
+		cout<<"Error: method for finding moves not found"<<endl;
+	}
 	void sumove(int x, int y){
 		//cout<<"sumoved"<<endl;
 		do_move(rank, file, x, y, true);
@@ -448,7 +451,9 @@ public:
 		}
 		else return false; //target square already has frienly piece on it
 	}
-
+	virtual vector<move> getmoves(){
+		
+	}
 	King (int a, int b, int y){
 		rank = a;
 		file = b;

@@ -3,6 +3,7 @@
 #include <iostream>
 #include <string>
 #include <cmath>
+#include <vector>
 #define white 0
 #define black 1
 
@@ -23,6 +24,7 @@ bool do_move(int rank, int file, int x, int y, bool sumo);
 bool checkcheck(int colour);
 bool checkcheck(int colout, int rank, int file, int x, int y);
 bool checkcheckmate(int colour);
+bool checkstalemate(int colour);
 
 //Variables
 string command;
@@ -30,6 +32,15 @@ int final_args[4];
 bool turn = white; //use turn = !turn to switch //white == 0; black == 1;
 int turn_counter; 
 bool check_flag = false;
+
+struct move {
+	int rank;
+	int file;
+	int x;
+	int y;
+	int score;
+	bool capture;
+};
 
 #include "pieces.cpp"
 
@@ -290,5 +301,9 @@ bool checkcheckmate(int colour){	//only call this function if the specified colo
 	}
 	//have scanned entire board for possible moves, not yet returned from the function therefore checkmate
 	return true;
+}
+
+bool checkstalemate(int colour){	//only call this if not in check
+
 }
 #endif

@@ -23,8 +23,9 @@ Advanced gameplay mechanics
 	-Castling
 	-pawn promotion
 
-Board scoring
-Permute next possible moves
+Chess Engine
+	-Board scoring
+	-Permute next possible moves
 
 Recording games?
 Playing games from files?

@@ -1,6 +1,5 @@
 /*Chess
 Gareth Funk - 2015
-git test
 */
 
 #include "header.h"
@@ -26,6 +25,10 @@ git test
 					else cout<<"White is in check!"<<endl;
 
 				}
+				if(stalemate(white)){
+					cout<<"Stalemate reached. Game Over."<<endl;
+					return 1;
+				}
 				cout<<"White to move"<<endl;
 			}
 			else if(turn == black){
@@ -35,7 +38,10 @@ git test
 						return 1;
 					}
 					else cout<<"Black is in check!"<<endl;
-
+				}
+				if(stalemate(black)){
+					cout<<"Stalemate reached. Game Over."<<endl;
+					return 1;
 				}
 				cout<<"Black to move"<<endl;
 			}
