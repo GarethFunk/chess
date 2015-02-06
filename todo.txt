@@ -1,0 +1,25 @@
+-detect checkmate
+-detect stalemate
+	-player not in check but no legal move
+	-no possibility of checkmate
+		-king against king
+		-king against king and bishop
+		-king against king and knight
+		-king and bishop against king and bishop with both bishops of the same square colour
+X	-both players agree
+	-no capture or pawn move in the last fifty moves
+	-the same board has occurred three times with the same player to move and all pieces having the same rights to move including castling and en passant capture
+X-resigning 
+
+
+
+Advanced gameplay mechanics
+	-Pawns: En Passant capture
+	-Castling
+	-pawn promotion
+
+Board scoring
+Permute next possible moves
+
+Recording games?
+Playing games from files?
