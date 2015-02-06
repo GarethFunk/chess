@@ -9,6 +9,9 @@ public:
 	virtual void move(int x, int y){
 		cout<<"Error: method for moving piece not found"<<endl;
 	}
+	virtual bool islegal(int x, int y){
+		cout<<"Error: method for checking legality not found"<<endl;
+	}
 	void sumove(int x, int y){
 		//cout<<"sumoved"<<endl;
 		do_move(rank, file, x, y, true);
@@ -37,8 +40,8 @@ const int squares[8][8]{
 	{black, white, black, white, black, white, black, white}};
 
 class Pawn: public piece {
-private: 
-	bool islegal(int x, int y){
+public: 
+	virtual bool islegal(int x, int y){
 		piece* target_piece = board[x][y];
 		if(target_piece == NULL || target_piece->colour != colour){ //Check target square is either empty or has enemy piece on it
 			if(colour == white){		//white rules i.e. can only move up the board
@@ -75,7 +78,6 @@ private:
 		}
 	}
 
-public:
 	Pawn (int a, int b, int y){
 		rank = a;
 		file = b;
@@ -99,8 +101,8 @@ public:
 };
 
 class Rook: public piece {
-private: 
-	bool islegal(int x, int y){
+public: 
+	virtual bool islegal(int x, int y){
 		piece* target_piece = board[x][y];
 		if(target_piece == NULL || target_piece->colour != colour){ //Check target square is either empty or has enemy piece on it
 			if(rank == x && y != file){ 		//moving along a row
@@ -148,7 +150,6 @@ private:
 		}
 	}
 
-public:
 	Rook (int a, int b, int y){
 		rank = a;
 		file = b;
@@ -172,8 +173,8 @@ public:
 };
 
 class Knight: public piece {
-private: 
-	bool islegal(int x, int y){
+public: 
+	virtual bool islegal(int x, int y){
 		piece* target_piece = board[x][y];
 		if(target_piece == NULL || target_piece->colour != colour){ //Check target square is either empty or has enemy piece on it
 			if(abs(rank - x) == 2 && abs(file - y) == 1){ //move in vertical L
@@ -189,7 +190,6 @@ private:
 		}
 	}
 
-public:
 	Knight (int a, int b, int y){
 		rank = a;
 		file = b;
@@ -213,8 +213,8 @@ public:
 };
 
 class Bishop: public piece {
-private: 
-	bool islegal(int x, int y){
+public: 
+	virtual bool islegal(int x, int y){
 		piece* target_piece = board[x][y];
 		if(target_piece == NULL || target_piece->colour != colour){ //Check target square is either empty or has enemy piece on it
 			//Piece specific moves
@@ -283,7 +283,6 @@ private:
 		}
 	}
 
-public:
 	Bishop (int a, int b, int y){
 		rank = a;
 		file = b;
@@ -308,8 +307,8 @@ public:
 };
 
 class Queen: public piece {
-private: 
-	bool islegal(int x, int y){
+public: 
+	virtual bool islegal(int x, int y){
 		piece* target_piece = board[x][y];
 		if(target_piece == NULL || target_piece->colour != colour){ //Check target square is either empty or has enemy piece on it
 				//Piece specific moves
@@ -414,7 +413,6 @@ private:
 		else return false; //target square already has friednly piece on it
 	}
 
-public:
 	Queen (int a, int b, int y){
 		rank = a;
 		file = b;
@@ -438,8 +436,8 @@ public:
 };
 
 class King: public piece {
-private: 
-	bool islegal(int x, int y){
+public: 
+	virtual bool islegal(int x, int y){
 		piece* target_piece = board[x][y];
 		//Piece specific moves
 		if(target_piece == NULL || target_piece->colour != colour){ //Check target square is either empty or has enemy piece on it
@@ -451,7 +449,6 @@ private:
 		else return false; //target square already has frienly piece on it
 	}
 
-public:
 	King (int a, int b, int y){
 		rank = a;
 		file = b;

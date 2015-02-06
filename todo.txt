@@ -1,4 +1,9 @@
--detect checkmate
+Bugs
+
+
+
+Basic Gameplay
+X-detect checkmate
 -detect stalemate
 	-player not in check but no legal move
 	-no possibility of checkmate

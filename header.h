@@ -21,13 +21,15 @@ int score_board(int colour);
 bool do_move(int rank, int file, int x, int y);
 bool do_move(int rank, int file, int x, int y, bool sumo);
 bool checkcheck(int colour);
+bool checkcheck(int colout, int rank, int file, int x, int y);
 bool checkcheckmate(int colour);
 
 //Variables
 string command;
 int final_args[4];
 bool turn = white; //use turn = !turn to switch //white == 0; black == 1;
-int turn_counter;
+int turn_counter; 
+bool check_flag = false;
 
 #include "pieces.cpp"
 
@@ -99,15 +101,7 @@ bool do_move(int rank, int file, int x, int y){
 		draw_board();
 		turn = !turn;
 		turn_counter++;
-		bool check_flag = checkcheck(!(board[x][y]->colour)); //check if other team is now in check
-		if(turn == white){
-			if(check_flag) cout<<"White is in check!"<<endl;
-			cout<<"White to move"<<endl;
-		}
-		else{
-			if(check_flag) cout<<"Black is in check!"<<endl;
-			cout<<"Black to move"<<endl;
-		}
+		check_flag = checkcheck(!(board[x][y]->colour)); //check if other team is now in check
 		return true;
 	}
 }
@@ -148,6 +142,7 @@ bool checkcheck(int colour){
 	i = y -1;
 	for(i; i>=0; i--){
 		if(board[x][i] != NULL && (board[x][i]->type == rook || board[x][i]->type == queen) && board[x][i]->colour != colour ) return true; //found enemy piece with clear line of sight.
+		if(i == y-1 && board[x][i] != NULL && board[x][i]->type == king) return true; //found king
 		if(board[x][i] != NULL) break;	//found piece blocking
 	}
 	//cout<<"checked left"<<endl;
@@ -155,6 +150,7 @@ bool checkcheck(int colour){
 	i = y +1;
 	for(i; i<8; i++){
 		if(board[x][i] != NULL && (board[x][i]->type == rook || board[x][i]->type == queen) && board[x][i]->colour != colour) return true; //found enemy piece with clear line of sight.
+		if(i == y+1 && board[x][i] != NULL && board[x][i]->type == king) return true; //found king
 		if(board[x][i] != NULL) break;	//found piece blocking
 	}
 	//cout<<"checked right"<<endl;
@@ -162,6 +158,7 @@ bool checkcheck(int colour){
 	i = x + 1;
 	for(i; i<8; i++){
 		if(board[i][y] != NULL && (board[i][y]->type == rook || board[i][y]->type == queen) && board[i][y]->colour != colour) return true; //found enemy piece with clear line of sight.
+		if(i == x+1 && board[i][y] != NULL && board[i][y]->type == king) return true; //found king
 		if(board[i][y] != NULL) break;	//found piece blocking
 	}
 	//cout<<"checked down"<<endl;
@@ -169,6 +166,7 @@ bool checkcheck(int colour){
 	i = x - 1;
 	for(i; i>=0; i--){
 		if(board[i][y] != NULL && (board[i][y]->type == rook || board[i][y]->type == queen) && board[i][y]->colour != colour) return true; //found enemy piece with clear line of sight.
+		if(i == x-1 && board[i][y] != NULL && board[i][y]->type == king) return true; //found king
 		if(board[i][y] != NULL) break;	//found piece blocking
 	}
 	//cout<<"checked up"<<endl;
@@ -177,6 +175,7 @@ bool checkcheck(int colour){
 	j = y + 1;
 	while(i>=0 && j<8){
 		if(board[i][j] != NULL && (board[i][j]->type == bishop || board[i][j]->type == queen) && board[i][j]->colour != colour) return true; //found enemy piece with clear line of sight.
+		if(i == x-1 && board[i][j] != NULL && board[i][j]->type == king) return true; //found king
 		if(board[i][j] != NULL) break;	//found piece blocking
 		i--;
 		j++;
@@ -187,6 +186,7 @@ bool checkcheck(int colour){
 	j = y - 1;
 	while(i>=0 && j>=0){
 		if(board[i][j] != NULL && (board[i][j]->type == bishop || board[i][j]->type == queen) && board[i][j]->colour != colour) return true; //found enemy piece with clear line of sight.
+		if(i == x-1 && board[i][j] != NULL && board[i][j]->type == king) return true; //found king
 		if(board[i][j] != NULL) break;	//found piece blocking
 		i--;
 		j--;
@@ -198,6 +198,7 @@ bool checkcheck(int colour){
 	j = y + 1;
 	while(i<8 && j<8){
 		if(board[i][j] != NULL && (board[i][j]->type == bishop || board[i][j]->type == queen) && board[i][j]->colour != colour) return true; //found enemy piece with clear line of sight.
+		if(i == x+1 && board[i][j] != NULL && board[i][j]->type == king) return true; //found king
 		if(board[i][j] != NULL) break;	//found piece blocking
 		i++;
 		j++;
@@ -208,6 +209,7 @@ bool checkcheck(int colour){
 	j = y - 1;
 	while(i<8 && j>=0){
 		if(board[i][j] != NULL && (board[i][j]->type == bishop || board[i][j]->type == queen) && board[i][j]->colour != colour) return true; //found enemy piece with clear line of sight.
+		if(i == x+1 && board[i][j] != NULL && board[i][j]->type == king) return true; //found king
 		if(board[i][j] != NULL) break;	//found piece blocking
 		i++;
 		j--;
@@ -251,7 +253,42 @@ bool checkcheck(int colour){
 	return false; //all tests passed without returning true
 }
 
-bool checkcheckmate(int colour){
-	return 0;
+bool checkcheck(int colout, int rank, int file, int x, int y){	//ONLY GIVE THIS FUNCTION LEGAL COORDINATES
+	piece* piece_buffer = board[x][y];
+	board[x][y] = board[rank][file];
+	board[rank][file] = NULL;
+	if(checkcheck(board[x][y]->colour)){ //if the proposed move would result in check
+		//reset pieces to how they were
+		board[rank][file] = board[x][y];
+		board[x][y] = piece_buffer;
+		return true;
+	}
+	else{	//reset pieces to how they were
+		board[rank][file] = board[x][y];
+		board[x][y] = piece_buffer;
+		return false;
+	}
+}
+
+bool checkcheckmate(int colour){	//only call this function if the specified colour is in check! 
+	for(int rank = 0; rank < 8; rank++){
+		for(int file = 0; file < 8; file++){
+			//cout<<"Checking "<<rank<<" "<<file<<endl;
+			if(board[rank][file] != NULL && board[rank][file]->colour == colour){	//If there is a piece on this square and it is of the same colour
+				for(int x = 0; x < 8; x++){
+					for(int y = 0; y < 8; y++){
+						if(board[rank][file]->islegal(x, y) == true){	//if move legal
+							if(checkcheck(colour, rank, file, x, y) == false){ //if move would result in you not being in check
+								//cout<<"There is a move which could get you out of check, mate."<<endl;
+								return false;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	//have scanned entire board for possible moves, not yet returned from the function therefore checkmate
+	return true;
 }
 #endif
