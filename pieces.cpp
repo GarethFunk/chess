@@ -12,8 +12,22 @@ public:
 	virtual bool islegal(int x, int y){
 		cout<<"Error: method for checking legality not found"<<endl;
 	}
-	virtual vector<move> getmoves(){
-		cout<<"Error: method for finding moves not found"<<endl;
+	vector<a_move> getmoves(){
+		vector<a_move> all_moves;
+		for(int i = rank -1; i <=rank + 1; i++){
+			for(int j = file -1; j <= file + 1; j++){
+				if(i >= 0 && i <=7 && j>=0 && j<=7 && islegal(i, j) && checkcheck(colour, rank, file, i, j) == false){	
+				//If the move is a valid coordinate and is legal and does not result in check. 
+					all_moves.push_back({rank, file, i, j});
+				}
+			}
+		}
+		
+		/*cout<<"piece at "<<rank<<" "<<file<<" can move: "<<endl;
+		for(int i = 0; i < all_moves.size(); i++){
+			cout<<all_moves[i].x<<" "<<all_moves[i].y<<endl;
+		}*/
+		return all_moves;
 	}
 	void sumove(int x, int y){
 		//cout<<"sumoved"<<endl;
@@ -450,9 +464,6 @@ public:
 			else return false; //move not of radius 1	
 		}
 		else return false; //target square already has frienly piece on it
-	}
-	virtual vector<move> getmoves(){
-		
 	}
 	King (int a, int b, int y){
 		rank = a;

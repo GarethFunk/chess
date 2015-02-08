@@ -11,6 +11,14 @@
 using namespace std;
 
 enum types {pawn, rook, knight, bishop, queen, king};
+struct a_move {
+	int rank;
+	int file;
+	int x;
+	int y;
+	int score;
+	bool capture;
+};
 
 //Prototypes
 void draw_board();
@@ -22,7 +30,8 @@ int score_board(int colour);
 bool do_move(int rank, int file, int x, int y);
 bool do_move(int rank, int file, int x, int y, bool sumo);
 bool checkcheck(int colour);
-bool checkcheck(int colout, int rank, int file, int x, int y);
+bool checkcheck(int colour, int rank, int file, int x, int y);
+bool checkcheck(int colour, a_move target_move);
 bool checkcheckmate(int colour);
 bool checkstalemate(int colour);
 
@@ -33,14 +42,7 @@ bool turn = white; //use turn = !turn to switch //white == 0; black == 1;
 int turn_counter; 
 bool check_flag = false;
 
-struct move {
-	int rank;
-	int file;
-	int x;
-	int y;
-	int score;
-	bool capture;
-};
+
 
 #include "pieces.cpp"
 
@@ -247,27 +249,32 @@ bool checkcheck(int colour){
 	//cout<<"checked knights"<<endl;
 	//check pawns
 	if(colour == white){		//check up the board for black pawns
-		i = x - 1;
-		j = y + 1; //on the right
-		if(board[i][j] != NULL && board[i][j]->colour != colour && board[i][j]->type == pawn) return true;	//found enemy pawn in valid location
-		j = y - 1; //on the left
-		if(board[i][j] != NULL && board[i][j]->colour != colour && board[i][j]->type == pawn) return true;	//found enemy pawn in valid location
+		if(x != 0){		//check not on rank 8
+			i = x - 1;
+			j = y + 1; //on the right
+			if(board[i][j] != NULL && board[i][j]->colour != colour && board[i][j]->type == pawn) return true;	//found enemy pawn in valid location
+			j = y - 1; //on the left
+			if(board[i][j] != NULL && board[i][j]->colour != colour && board[i][j]->type == pawn) return true;	//found enemy pawn in valid location
+		}
 	}
 	else{		//check down the board for white pawns
-		i = x + 1;
-		j = y + 1;	//on the right 
-		if(board[i][j] != NULL && board[i][j]->colour != colour && board[i][j]->type == pawn) return true;	//found enemy pawn in valid location
-		j = y - 1; //on the left
-		if(board[i][j] != NULL && board[i][j]->colour != colour && board[i][j]->type == pawn) return true;	//found enemy pawn in valid location
+		if(x != 7){		//check not on rank 1
+			i = x + 1;
+			j = y + 1;	//on the right 
+			if(board[i][j] != NULL && board[i][j]->colour != colour && board[i][j]->type == pawn) return true;	//found enemy pawn in valid location
+			j = y - 1; //on the left
+			if(board[i][j] != NULL && board[i][j]->colour != colour && board[i][j]->type == pawn) return true;	//found enemy pawn in valid location
+		}
 	}
 	//cout<<"checked pawns"<<endl;
 	return false; //all tests passed without returning true
 }
 
-bool checkcheck(int colout, int rank, int file, int x, int y){	//ONLY GIVE THIS FUNCTION LEGAL COORDINATES
+bool checkcheck(int colour, int rank, int file, int x, int y){	//ONLY GIVE THIS FUNCTION LEGAL COORDINATES
 	piece* piece_buffer = board[x][y];
 	board[x][y] = board[rank][file];
 	board[rank][file] = NULL;
+	//cout<<"Moved pieces"<<endl;
 	if(checkcheck(board[x][y]->colour)){ //if the proposed move would result in check
 		//reset pieces to how they were
 		board[rank][file] = board[x][y];
@@ -281,21 +288,19 @@ bool checkcheck(int colout, int rank, int file, int x, int y){	//ONLY GIVE THIS 
 	}
 }
 
+bool checkcheck(int colour, a_move target_move){
+	return checkcheck(colour, target_move.rank, target_move.file, target_move.x, target_move.y);
+}
+
 bool checkcheckmate(int colour){	//only call this function if the specified colour is in check! 
+	vector<a_move> piece_moves;
 	for(int rank = 0; rank < 8; rank++){
 		for(int file = 0; file < 8; file++){
 			//cout<<"Checking "<<rank<<" "<<file<<endl;
 			if(board[rank][file] != NULL && board[rank][file]->colour == colour){	//If there is a piece on this square and it is of the same colour
-				for(int x = 0; x < 8; x++){
-					for(int y = 0; y < 8; y++){
-						if(board[rank][file]->islegal(x, y) == true){	//if move legal
-							if(checkcheck(colour, rank, file, x, y) == false){ //if move would result in you not being in check
-								//cout<<"There is a move which could get you out of check, mate."<<endl;
-								return false;
-							}
-						}
-					}
-				}
+				//if there is a legal move which results in you not being in check => not checkmate
+				piece_moves = board[rank][file]->getmoves();
+				if(piece_moves.size() != 0) return false;
 			}
 		}
 	}
@@ -304,6 +309,19 @@ bool checkcheckmate(int colour){	//only call this function if the specified colo
 }
 
 bool checkstalemate(int colour){	//only call this if not in check
+	vector<a_move> piece_moves;
+	for(int i = 0; i < 8; i++){
+		for(int j = 0; j < 8; j++){
+			if(board[i][j] != NULL && board[i][j]->colour == colour){	//found a piece of the correct colour
+				//check to see if this piece has any legal moves
+				piece_moves = board[i][j]->getmoves();
+				if(piece_moves.size() != 0) return false;
+			}
+		}
+	}
+	//check all pieces of given colour, none had any legal moves.
+	return true;
+}	
 
-}
+
 #endif

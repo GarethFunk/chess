@@ -7,7 +7,7 @@ Gareth Funk - 2015
 #include "parser.cpp"
 
 
- main(){
+int main(){
  	initialise();
 	cout<<"White to move"<<endl;
 	while(1==1){
@@ -23,9 +23,8 @@ Gareth Funk - 2015
 						return 1;
 					}
 					else cout<<"White is in check!"<<endl;
-
 				}
-				if(stalemate(white)){
+				else if(checkstalemate(white)){		//not in check, test stalemate
 					cout<<"Stalemate reached. Game Over."<<endl;
 					return 1;
 				}
@@ -39,12 +38,13 @@ Gareth Funk - 2015
 					}
 					else cout<<"Black is in check!"<<endl;
 				}
-				if(stalemate(black)){
+				else if(checkstalemate(black)){		//not in check, test stalemate
 					cout<<"Stalemate reached. Game Over."<<endl;
 					return 1;
 				}
 				cout<<"Black to move"<<endl;
 			}
+			
 		}
 	}
 	return 1;
@@ -69,8 +69,8 @@ void initialise(){
 	board[1][3] = &d7;
 	board[1][4] = &e7;
 	board[1][5] = &f7;
-	board[1][6] = &g7;
-	board[1][7] = &h7;
+	board[1][6] = &g7; 
+	board[1][7] = &h7; 
 	//White back row
 	board[7][0] = &a1;	//rook
 	board[7][1] = &b1;	//knight

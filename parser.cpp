@@ -52,7 +52,7 @@ int parse(string input){
 	else if(command == "help"){
 		cout<<	"move(x1,y2)\tMoves the piece at x1 to y2\n"<<
 				"stalemate\tDeclares a stalemate to which both players must agree\n"<<
-				"resign\tResign from the game. The other player will win\n"<<
+				"resign\t\tResign from the game. The other player will win\n"<<
 				"exit\t\tQuits the program and returns to the terminal\n"<<endl;
 	}
 	else if(command == "exit"){
