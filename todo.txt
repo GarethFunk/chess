@@ -1,6 +1,4 @@
 Bugs
--domove should be moved into piece class
-
 
 
 Basic Gameplay

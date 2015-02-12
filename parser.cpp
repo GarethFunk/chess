@@ -2,7 +2,7 @@
 
 int parse(string input){
 	int open, close, comma;
-	if(input.find("(") != -1){
+	if(input.find("(") != -1 && input.find(")") != -1){
 		open = input.find_first_of("(");
 		close = input.find_last_of(")");
 		command = input;
@@ -14,7 +14,7 @@ int parse(string input){
 	if(command == "move"){
 		//parse arguments
 		string arguments = input;
-		arguments = arguments.erase(0,5); //LENGTH TO ERASE DEPENDS ON LENGTH OF KEYWORD!
+		arguments = arguments.erase(0,open+1); //LENGTH TO ERASE DEPENDS ON LENGTH OF KEYWORD!
 		arguments = arguments.erase(arguments.length()-1, 1);
 		comma = arguments.find_first_of(",");
 		string argument1 = arguments;
