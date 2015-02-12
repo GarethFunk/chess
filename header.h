@@ -44,45 +44,39 @@ bool check_flag = false;
 
 #include "pieces.cpp"
 
-bool Pawn::promotion(int x, int y){
-	do_move(x, y);
-		int new_type;
-		cout<<"Choose which piece you would like to promote your pawn to\n1\tRook\n2\tKnight\n3\tBishop\n4\tQueen"<<endl;
-		cin>>new_type;
-		if(new_type>0 && new_type<5){
-			//create new object
-			//insert address of new object into array
-			switch(new_type){
-				case 1 :
-				{
-					Rook promotedrook (rank, file, colour);
-					board[rank][file] = &promotedrook;
-					break;
-				}
-				case 2 :
-				{
-					Knight promotedknight (rank, file, colour);
-					board[rank][file] = &promotedknight;
-					break;
-				}
-				case 3 :
-				{
-					Bishop promotedbishop (rank, file, colour);
-					board[rank][file] = &promotedbishop;	
-					break;
-				}
-				case 4 :
-				{
-					Queen promotedqueen (rank, file, colour);
-					board[rank][file] = &promotedqueen;
-					break;
-				}
-				default :
-					return false;
-			}
-			return true;
+bool Pawn::promote(int new_type){
+	//create new object
+	//insert address of new object into array
+	switch(new_type){
+		case 1 :
+		{
+			board[rank][file] = new Rook[1]();
+			break;
 		}
-	return false;
+		case 2 :
+		{
+			board[rank][file] = new Knight[1]();
+			break;
+		}
+		case 3 :
+		{
+			board[rank][file] = new Bishop[1]();	
+			break;
+		}
+		case 4 :
+		{
+			board[rank][file] = new Queen[1]();
+			break;
+		}
+		default :
+			cout<<"Not a valid selection: try again."<<endl;
+			return false;
+	}
+	//update new properties
+	board[rank][file]->colour = colour;
+	board[rank][file]->rank = rank;
+	board[rank][file]->file = file;
+	return true;
 }
 
 //Piece Declaration

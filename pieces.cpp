@@ -6,7 +6,7 @@ public:
 	types type;
 	int move_count = 0;
 	int value;
-	bool do_move(int x, int y);
+	virtual bool do_move(int x, int y);
 	bool do_move(int x, int y, bool sumo);	
 	virtual bool islegal(int x, int y){
 		cout<<"Error: method for checking legality not found"<<endl;
@@ -22,13 +22,13 @@ public:
 				}
 			}
 		}
-		
 		/*cout<<"piece at "<<rank<<" "<<file<<" can move: "<<endl;
 		for(int i = 0; i < all_moves.size(); i++){
 			cout<<all_moves[i].x<<" "<<all_moves[i].y<<endl;
 		}*/
 		return all_moves;
 	}
+
 };
 
 //board[rank, rows][file, columns]
@@ -103,53 +103,89 @@ bool piece::do_move(int x, int y, bool sumo){
 
 class Pawn: public piece {
 private:
-	bool promotion(int x, int y);
+	bool promote(int new_type);	//prototype for promotion function. Define outisde because refers to other classes not yet defines. 
+	bool eligible_for_promotion(int x){
+		if(colour == white && x == 0) return true;
+		else if(colour == black && x == 7) return true;
+		return false;
+	}
+	bool en_passant(int x, int y){
+		if(board[rank][y] != NULL && board[rank][y]->type == pawn && board[rank][y]->move_count == 1) return true;
+		return false;
+	}
 
 public: 
+	virtual bool do_move(int x, int y){
+	if(colour == turn){		//Check piece is allowed to move on this turn
+		if(islegal(x, y)){		//Check move is legal
+			if(checkcheck(colour, rank, file, x, y)){ //if the proposed move puts you in check
+				cout<<"Move would result with you in check"<<endl;
+				return false;
+			}
+			else{		//move does not put you in check
+			//update piece properties and make the move
+			board[x][y] = board[rank][file];
+			board[rank][file] = NULL;
+			//make en passant capture if eligible
+			if(en_passant(x, y)) board[rank][y] = NULL;
+			rank = x;
+			file = y;
+			move_count++;
+			if(eligible_for_promotion(x)){
+				int new_type;
+				cout<<"Choose which piece you would like to promote your pawn to\n1\tRook\n2\tKnight\n3\tBishop\n4\tQueen"<<endl;
+				do{
+					cin>>new_type;				
+				} while(!promote(new_type));
+			}
+			draw_board();
+			turn = !turn;
+			turn_counter++;
+			check_flag = checkcheck(!colour); //check if other team is now in check
+			return true;
+			}
+		}
+		else{
+			cout<<"Move not legal"<<endl;
+			return false;
+		}
+	}	
+	else{
+		cout<<"It is not your turn!"<<endl;
+		return false;
+	}
+}
 	virtual bool islegal(int x, int y){
 		piece* target_piece = board[x][y];
 		if(target_piece == NULL || target_piece->colour != colour){ //Check target square is either empty or has enemy piece on it
 			if(colour == white){		//white rules i.e. can only move up the board
-				if(rank - x == 1 && y == file && target_piece == NULL){ //moving one space forwards
-					return true;
-				}
-				else if(rank - x == 2 && move_count == 0 && target_piece == NULL){ //moving two spaces forwards
-					return true;
-				}
-				else if(rank - x == 1 && abs(y - file) == 1 && target_piece != NULL){ //taking an enemy piece 
-					return true;
-				}
-				else{
-					return false;
-				}
+				if(rank - x == 1 && y == file && target_piece == NULL) return true;					//moving one space forwards
+				else if(rank - x == 2 && move_count == 0 && target_piece == NULL) return true;		//moving two spaces forwards
+				else if(rank - x == 1 && abs(y - file) == 1 && target_piece != NULL) return true;	//taking an enemy piece 
+				else if(rank - x == 1 && abs(y - file) == 1 && board[rank][y] != NULL && board[rank][y]->type == pawn && board[rank][y]->move_count == 1) return true; //en passant capture
+				else return false;
 			}
 			else{		//black rules i.e. can only move down the board. 
-				if(x - rank == 1 && y == file && target_piece == NULL){ //moving one space forwards
-					return true;
-				}
-				else if(x - rank == 2 && move_count == 0 && target_piece == NULL){ //moving two spaces forwards
-					return true;
-				}
-				else if(x - rank == 1 && abs(y - file) == 1 && target_piece != NULL){ //taking an enemy piece 
-					return true;
-				}
-				else{
-					return false;
-				}
+				if(x - rank == 1 && y == file && target_piece == NULL) return true;					//moving one space forwards
+				else if(x - rank == 2 && move_count == 0 && target_piece == NULL) return true;	 	//moving two spaces forwards
+				else if(x - rank == 1 && abs(y - file) == 1 && target_piece != NULL) return true;	//taking an enemy piece 
+				else if(x - rank == 1 && abs(y - file) == 1 && board[rank][y] != NULL && board[rank][y]->type == pawn && board[rank][y]->move_count == 1) return true; //en passant capture
+				else return false;
 			}	
 		}
-		else{
-			return false;
-		}
+		else return false;
 	}
-
-	Pawn (int a, int b, int y){
+	Pawn(int a, int b, int y){
 		rank = a;
 		file = b;
 		colour = y;
 		type = pawn;
 		value = 1;
-	};
+	}
+	Pawn(){
+		type = pawn;
+		value = 1;
+	}
 };
 
 class Rook: public piece {
@@ -202,13 +238,17 @@ public:
 		}
 	}
 
-	Rook (int a, int b, int y){
+	Rook(int a, int b, int y){
 		rank = a;
 		file = b;
 		colour = y;
 		type = rook;
 		value = 5;
-	};
+	}
+	Rook(){
+		type = rook;
+		value = 5;
+	}
 };
 
 class Knight: public piece {
@@ -229,13 +269,17 @@ public:
 		}
 	}
 
-	Knight (int a, int b, int y){
+	Knight(int a, int b, int y){
 		rank = a;
 		file = b;
 		colour = y;
 		type = knight;
 		value = 3;
-	};
+	}
+	Knight(){
+		type = knight;
+		value = 3;
+	}
 };
 
 class Bishop: public piece {
@@ -309,14 +353,19 @@ public:
 		}
 	}
 
-	Bishop (int a, int b, int y){
+	Bishop(int a, int b, int y){
 		rank = a;
 		file = b;
 		colour = y;
 		type = bishop;
 		int square_colour = squares[a][b];
 		value = 3;
-	};
+	}
+	Bishop(){
+		type = bishop;
+		int square_colour = squares[rank][file];
+		value = 3;
+	}
 };
 
 class Queen: public piece {
@@ -426,13 +475,17 @@ public:
 		else return false; //target square already has friednly piece on it
 	}
 
-	Queen (int a, int b, int y){
+	Queen(int a, int b, int y){
 		rank = a;
 		file = b;
 		colour = y;
 		type = queen;
 		value = 9;
-	};
+	}
+	Queen(){
+		type = queen;
+		value = 9;
+	}
 };
 
 class King: public piece {

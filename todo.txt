@@ -1,5 +1,7 @@
 Bugs
-
+-promotion uses new[] to make new piece. 
+	-implement throughout?
+	-consequences for massive iterations of moves?
 
 Basic Gameplay
 X-detect checkmate
@@ -18,7 +20,7 @@ X-resigning
 
 
 Advanced gameplay mechanics
-	-Pawns: En Passant capture
+	X-Pawns: En Passant capture
 	-Castling
 	-pawn promotion
 

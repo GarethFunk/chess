@@ -21,7 +21,7 @@ string get_rank(int rank){
 	string spacer = " | ";
 	string line = spacer;
 	for(int i = 0; i<8; i++){
-		if(board[rank][i] != 0){
+		if(board[rank][i] != NULL){
 			if((*board[rank][i]).colour == black){
 				switch ((*board[rank][i]).type){
 					case pawn :
