@@ -6,11 +6,11 @@ public:
 	types type;
 	int move_count = 0;
 	int value;
-	virtual void move(int x, int y){
-		cout<<"Error: method for moving piece not found"<<endl;
-	}
+	bool do_move(int x, int y);
+	bool do_move(int x, int y, bool sumo);	
 	virtual bool islegal(int x, int y){
 		cout<<"Error: method for checking legality not found"<<endl;
+		return false;
 	}
 	vector<a_move> getmoves(){
 		vector<a_move> all_moves;
@@ -28,10 +28,6 @@ public:
 			cout<<all_moves[i].x<<" "<<all_moves[i].y<<endl;
 		}*/
 		return all_moves;
-	}
-	void sumove(int x, int y){
-		//cout<<"sumoved"<<endl;
-		do_move(rank, file, x, y, true);
 	}
 };
 
@@ -56,7 +52,59 @@ const int squares[8][8]{
 	{white, black, white, black, white, black, white, black},
 	{black, white, black, white, black, white, black, white}};
 
+bool piece::do_move(int x, int y){
+	if(colour == turn){		//Check piece is allowed to move on this turn
+		if(islegal(x, y)){		//Check move is legal
+			if(checkcheck(colour, rank, file, x, y)){ //if the proposed move puts you in check
+				cout<<"Move would result with you in check"<<endl;
+				return false;
+			}
+			else{		//move does not put you in check
+			//update piece properties and make the move
+			board[x][y] = board[rank][file];
+			board[rank][file] = NULL;
+			rank = x;
+			file = y;
+			move_count++;
+			draw_board();
+			turn = !turn;
+			turn_counter++;
+			check_flag = checkcheck(!colour); //check if other team is now in check
+			return true;
+			}
+		}
+		else{
+			cout<<"Move not legal"<<endl;
+			return false;
+		}
+	}	
+	else{
+		cout<<"It is not your turn!"<<endl;
+		return false;
+	}
+}
+
+bool piece::do_move(int x, int y, bool sumo){
+	if(sumo){
+		//cout<<"sumoved"<<endl;
+		//update piece properties and make the move
+		board[x][y] = board[rank][file];
+		board[rank][file] = NULL;
+		board[x][y]->rank = x;
+		board[x][y]->file = y;
+		board[x][y]->move_count++;
+		draw_board();
+		return true;
+	}
+	else{
+		return do_move(x, y);
+	}
+}
+
 class Pawn: public piece {
+private:
+	bool promotion(int x, int y);
+
 public: 
 	virtual bool islegal(int x, int y){
 		piece* target_piece = board[x][y];
@@ -102,19 +150,6 @@ public:
 		type = pawn;
 		value = 1;
 	};
-	virtual void move(int x, int y){
-		if(colour == turn){		//Check piece is allowed to move on this turn
-			if(islegal(x, y)){		//Check move is legal
-				do_move(rank, file, x, y);
-			}
-			else{
-				cout<<"Move not legal"<<endl;
-			}
-		}
-		else{
-			cout<<"It is not your turn!"<<endl;
-		}
-	}
 };
 
 class Rook: public piece {
@@ -174,19 +209,6 @@ public:
 		type = rook;
 		value = 5;
 	};
-	virtual void move(int x, int y){
-		if(colour == turn){		//Check piece is allowed to move on this turn
-			if(islegal(x, y)){		//Check move is legal
-				do_move(rank, file, x, y);
-			}
-			else{
-				cout<<"Move not legal"<<endl;
-			}
-		}
-		else{
-			cout<<"It is not your turn!"<<endl;
-		}
-	}
 };
 
 class Knight: public piece {
@@ -214,19 +236,6 @@ public:
 		type = knight;
 		value = 3;
 	};
-	virtual void move(int x, int y){
-		if(colour == turn){		//Check piece is allowed to move on this turn
-			if(islegal(x, y)){		//Check move is legal
-				do_move(rank, file, x, y);
-			}
-			else{
-				cout<<"Move not legal"<<endl;
-			}
-		}
-		else{
-			cout<<"It is not your turn!"<<endl;
-		}
-	}
 };
 
 class Bishop: public piece {
@@ -308,19 +317,6 @@ public:
 		int square_colour = squares[a][b];
 		value = 3;
 	};
-	 virtual void move(int x, int y){
-		if(colour == turn){		//Check piece is allowed to move on this turn
-			if(islegal(x, y)){		//Check move is legal
-				do_move(rank, file, x, y);
-			}
-			else{
-				cout<<"Move not legal"<<endl;
-			}
-		}
-		else{
-			cout<<"It is not your turn!"<<endl;
-		}
-	}
 };
 
 class Queen: public piece {
@@ -437,19 +433,6 @@ public:
 		type = queen;
 		value = 9;
 	};
-	virtual void move(int x, int y){
-		if(colour == turn){		//Check piece is allowed to move on this turn
-			if(islegal(x, y)){		//Check move is legal
-				do_move(rank, file, x, y);
-			}
-			else{
-				cout<<"Move not legal"<<endl;
-			}	
-		}
-		else{
-			cout<<"It is not your turn!"<<endl;
-		}
-	}
 };
 
 class King: public piece {
@@ -471,18 +454,5 @@ public:
 		colour = y;
 		type = king;
 		value = 0;
-	};
-	virtual void move(int x, int y){
-		if(colour == turn){		//Check piece is allowed to move on this turn
-			if(islegal(x, y)){		//Check move is legal
-				do_move(rank, file, x, y);
-			}
-			else{
-				cout<<"Move not legal"<<endl;
-			}
-		}	
-		else{
-			cout<<"It is not your turn!"<<endl;
-		}
-	}
+	};	
 };

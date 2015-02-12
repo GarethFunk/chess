@@ -27,8 +27,6 @@ int parse(string input);
 void initialise();
 bool coordinate_switch(string a, string b);
 int score_board(int colour);
-bool do_move(int rank, int file, int x, int y);
-bool do_move(int rank, int file, int x, int y, bool sumo);
 bool checkcheck(int colour);
 bool checkcheck(int colour, int rank, int file, int x, int y);
 bool checkcheck(int colour, a_move target_move);
@@ -45,6 +43,47 @@ bool check_flag = false;
 
 
 #include "pieces.cpp"
+
+bool Pawn::promotion(int x, int y){
+	do_move(x, y);
+		int new_type;
+		cout<<"Choose which piece you would like to promote your pawn to\n1\tRook\n2\tKnight\n3\tBishop\n4\tQueen"<<endl;
+		cin>>new_type;
+		if(new_type>0 && new_type<5){
+			//create new object
+			//insert address of new object into array
+			switch(new_type){
+				case 1 :
+				{
+					Rook promotedrook (rank, file, colour);
+					board[rank][file] = &promotedrook;
+					break;
+				}
+				case 2 :
+				{
+					Knight promotedknight (rank, file, colour);
+					board[rank][file] = &promotedknight;
+					break;
+				}
+				case 3 :
+				{
+					Bishop promotedbishop (rank, file, colour);
+					board[rank][file] = &promotedbishop;	
+					break;
+				}
+				case 4 :
+				{
+					Queen promotedqueen (rank, file, colour);
+					board[rank][file] = &promotedqueen;
+					break;
+				}
+				default :
+					return false;
+			}
+			return true;
+		}
+	return false;
+}
 
 //Piece Declaration
 Pawn a2 (6, 0, white);
@@ -95,44 +134,6 @@ int score_board(int colour){
 	return total_value;
 }
 
-bool do_move(int rank, int file, int x, int y){
-	piece* piece_buffer = board[x][y];
-	board[x][y] = board[rank][file];
-	board[rank][file] = NULL;
-	if(checkcheck(board[x][y]->colour)){ //if the proposed move puts you in check
-		cout<<"Move would result with you in check"<<endl;
-		//reset pieces to how they were
-		board[rank][file] = board[x][y];
-		board[x][y] = piece_buffer;
-		return false;
-	}
-	else{		//move does not put you in check
-		//update piece properties
-		board[x][y]->rank = x;
-		board[x][y]->file = y;
-		board[x][y]->move_count++;
-		draw_board();
-		turn = !turn;
-		turn_counter++;
-		check_flag = checkcheck(!(board[x][y]->colour)); //check if other team is now in check
-		return true;
-	}
-}
-
-bool do_move(int rank, int file, int x, int y, bool sumo){
-	if(sumo == true){
-	board[x][y] = board[rank][file];
-	board[rank][file] = NULL;
-	board[x][y]->rank = x;
-	board[x][y]->file = y;
-	board[x][y]->move_count++;
-	draw_board();
-	return 1;
-	}
-	else{
-		return do_move(rank, file, x, y);
-	}
-}
 
 bool checkcheck(int colour){
 	//find the correct king

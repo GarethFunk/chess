@@ -24,7 +24,7 @@ int parse(string input){
 		//change from chess coords to array coords
 		if(coordinate_switch(argument1, argument2)){
 			//make the move
-			board[final_args[0]][final_args[1]]->move(final_args[2], final_args[3]);
+			board[final_args[0]][final_args[1]]->do_move(final_args[2], final_args[3]);
 		}
 		else{
 			cout<<"Error: Invalid coordinates"<<endl;
@@ -42,7 +42,7 @@ int parse(string input){
 		argument2 = argument2.erase(0, comma+1);
 		//change from chess coords to array coords
 		if(coordinate_switch(argument1, argument2)){
-			board[final_args[0]][final_args[1]]->sumove(final_args[2], final_args[3]);
+			board[final_args[0]][final_args[1]]->do_move(final_args[2], final_args[3], true);
 		}
 		else{
 			cout<<"Error: Invalid coordinates (refers to an invalid location)"<<endl;
