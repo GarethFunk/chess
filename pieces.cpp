@@ -60,17 +60,18 @@ bool piece::do_move(int x, int y){
 				return false;
 			}
 			else{		//move does not put you in check
-			//update piece properties and make the move
-			board[x][y] = board[rank][file];
-			board[rank][file] = NULL;
-			rank = x;
-			file = y;
-			move_count++;
-			draw_board();
-			turn = !turn;
-			turn_counter++;
-			check_flag = checkcheck(!colour); //check if other team is now in check
-			return true;
+				//update piece properties and make the move
+				if(board[x][y] != NULL) delete board[x][y];	//delete captured piece
+				board[x][y] = board[rank][file];
+				board[rank][file] = NULL;
+				rank = x;
+				file = y;
+				move_count++;
+				draw_board();
+				turn = !turn;
+				turn_counter++;
+				check_flag = checkcheck(!colour); //check if other team is now in check
+				return true;
 			}
 		}
 		else{
@@ -123,26 +124,27 @@ public:
 				return false;
 			}
 			else{		//move does not put you in check
-			//update piece properties and make the move
-			board[x][y] = board[rank][file];
-			board[rank][file] = NULL;
-			//make en passant capture if eligible
-			if(en_passant(x, y)) board[rank][y] = NULL;
-			rank = x;
-			file = y;
-			move_count++;
-			if(eligible_for_promotion(x)){
-				int new_type;
-				cout<<"Choose which piece you would like to promote your pawn to\n1\tRook\n2\tKnight\n3\tBishop\n4\tQueen"<<endl;
-				do{
-					cin>>new_type;				
-				} while(!promote(new_type));
-			}
-			draw_board();
-			turn = !turn;
-			turn_counter++;
-			check_flag = checkcheck(!colour); //check if other team is now in check
-			return true;
+				//update piece properties and make the move
+				if(board[x][y] != NULL) delete board[x][y];	//delete captured piece
+				board[x][y] = board[rank][file];
+				board[rank][file] = NULL;
+				if(en_passant(x, y)) delete board[rank][y];	//make en passant capture if eligible
+				//update piece properties
+				rank = x;
+				file = y;
+				move_count++;
+				if(eligible_for_promotion(x)){
+					int new_type;
+					cout<<"Choose which piece you would like to promote your pawn to\n1\tRook\n2\tKnight\n3\tBishop\n4\tQueen"<<endl;
+					do{
+						cin>>new_type;				
+					} while(!promote(new_type));
+				}
+				draw_board();
+				turn = !turn;
+				turn_counter++;
+				check_flag = checkcheck(!colour); //check if other team is now in check
+				return true;
 			}
 		}
 		else{

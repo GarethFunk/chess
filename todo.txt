@@ -1,7 +1,6 @@
 Bugs
--promotion uses new[] to make new piece. 
-	-implement throughout?
-	-consequences for massive iterations of moves?
+-anything but a comma breaks move input
+
 
 Basic Gameplay
 X-detect checkmate

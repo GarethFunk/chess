@@ -50,32 +50,28 @@ bool Pawn::promote(int new_type){
 	switch(new_type){
 		case 1 :
 		{
-			board[rank][file] = new Rook[1]();
+			board[rank][file] = new Rook(rank, file, colour);
 			break;
 		}
 		case 2 :
 		{
-			board[rank][file] = new Knight[1]();
+			board[rank][file] = new Knight(rank, file, colour);
 			break;
 		}
 		case 3 :
 		{
-			board[rank][file] = new Bishop[1]();	
+			board[rank][file] = new Bishop(rank, file, colour);	
 			break;
 		}
 		case 4 :
 		{
-			board[rank][file] = new Queen[1]();
+			board[rank][file] = new Queen(rank, file, colour);
 			break;
 		}
 		default :
 			cout<<"Not a valid selection: try again."<<endl;
 			return false;
 	}
-	//update new properties
-	board[rank][file]->colour = colour;
-	board[rank][file]->rank = rank;
-	board[rank][file]->file = file;
 	return true;
 }
 

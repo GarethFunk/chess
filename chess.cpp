@@ -53,41 +53,28 @@ int main(){
 void initialise(){
 	turn = 0;
 	turn_counter = 1;
-	//White Pawns
-	board[6][0] = &a2;
-	board[6][1] = &b2;
-	board[6][2] = &c2;
-	board[6][3] = &d2;
-	board[6][4] = &e2;
-	board[6][5] = &f2;
-	board[6][6] = &g2;
-	board[6][7] = &h2;
-	//Black Pawns
-	board[1][0] = &a7;
-	board[1][1] = &b7;
-	board[1][2] = &c7;
-	board[1][3] = &d7;
-	board[1][4] = &e7;
-	board[1][5] = &f7;
-	board[1][6] = &g7; 
-	board[1][7] = &h7; 
+	//Pawns
+	for(int i = 0; i<8; i++){
+		board[6][i] = new Pawn(6, i, white);	//white pawn
+		board[1][i] = new Pawn(1, i, black);	//black pawn
+	}
 	//White back row
-	board[7][0] = &a1;	//rook
-	board[7][1] = &b1;	//knight
-	board[7][2] = &c1;	//bishop
-	board[7][3] = &d1;	//queen
-	board[7][4] = &e1;	//king
-	board[7][5] = &f1;	//bishop
-	board[7][6] = &g1;	//knight
-	board[7][7] = &h1;	//rook
+	board[7][0] = new Rook(7, 0, white);	//rook
+	board[7][1] = new Knight(7, 1, white);	//knight
+	board[7][2] = new Bishop(7, 2, white);	//bishop
+	board[7][3] = new Queen(7, 3, white);	//queen
+	board[7][4] = new King(7, 4, white);	//king
+	board[7][5] = new Bishop(7, 5, white);	//bishop
+	board[7][6] = new King(7, 6, white);	//knight
+	board[7][7] = new Rook(7, 7, white);	//rook
 	//Black back row
-	board[0][0] = &a8;	//rook
-	board[0][1] = &b8;	//knight
-	board[0][2] = &c8;	//bishop
-	board[0][3] = &d8;	//queen
-	board[0][4] = &e8;	//king
-	board[0][5] = &f8;	//bishop
-	board[0][6] = &g8;	//knight
-	board[0][7] = &h8;	//rook
+	board[0][0] = new Rook(0, 0, black);	//rook
+	board[0][1] = new Knight(0, 1, black);	//knight
+	board[0][2] = new Bishop(0, 2, black);	//bishop
+	board[0][3] = new Queen(0, 3, black);	//queen
+	board[0][4] = new King(0, 4, black);	//king
+	board[0][5] = new Bishop(0, 5, black);	//bishop
+	board[0][6] = new Knight(0, 6, black);	//knight
+	board[0][7] = new Rook(0, 7, black);	//rook
 	draw_board();
 }
