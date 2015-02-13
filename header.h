@@ -75,40 +75,6 @@ bool Pawn::promote(int new_type){
 	return true;
 }
 
-//Piece Declaration
-Pawn a2 (6, 0, white);
-Pawn b2 (6, 1, white);
-Pawn c2 (6, 2, white);
-Pawn d2 (6, 3, white);
-Pawn e2 (6, 4, white);
-Pawn f2 (6, 5, white);
-Pawn g2 (6, 6, white);
-Pawn h2 (6, 7, white);
-Pawn a7 (1, 0, black);
-Pawn b7 (1, 1, black);
-Pawn c7 (1, 2, black);
-Pawn d7 (1, 3, black);
-Pawn e7 (1, 4, black);
-Pawn f7 (1, 5, black);
-Pawn g7 (1, 6, black);
-Pawn h7 (1, 7, black);
-Rook a1 (7, 0, white);
-Knight b1 (7, 1, white);
-Bishop c1 (7, 2, white);
-Queen d1 (7, 3, white);
-King e1 (7, 4, white);
-Bishop f1 (7, 5, white);
-Knight g1 (7, 6, white);
-Rook h1 (7, 7, white);
-Rook a8 (0, 0, black);
-Knight b8 (0, 1, black);
-Bishop c8 (0, 2, black);
-Queen d8 (0, 3, black);
-King e8 (0, 4, black);
-Bishop f8 (0, 5, black);
-Knight g8 (0, 6, black);
-Rook h8 (0, 7, black);
-
 //Other Functions
 int score_board(int colour){
 	int total_value = 0;

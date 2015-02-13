@@ -16,19 +16,33 @@ int parse(string input){
 		string arguments = input;
 		arguments = arguments.erase(0,open+1); //LENGTH TO ERASE DEPENDS ON LENGTH OF KEYWORD!
 		arguments = arguments.erase(arguments.length()-1, 1);
-		comma = arguments.find_first_of(",");
-		string argument1 = arguments;
-		string argument2 = arguments;
-		argument1 = argument1.erase(2, argument1.length()-2);
-		argument2 = argument2.erase(0, comma+1);
-		//change from chess coords to array coords
-		if(coordinate_switch(argument1, argument2)){
-			//make the move
-			board[final_args[0]][final_args[1]]->do_move(final_args[2], final_args[3]);
+		if(arguments.find_first_of(",") != -1){		//if comma found
+			comma = arguments.find_first_of(",");
+			string argument1 = arguments;
+			string argument2 = arguments;
+			argument1 = argument1.erase(2, argument1.length()-2);
+			switch(arguments.length()){
+				case 5: 	//no spaces
+					argument2 = argument2.erase(0, comma+1);
+					break;
+				case 6:		//assume one space after the comma.
+					argument2 = argument2.erase(0, comma +2);
+					break;
+				default:
+					cout<<"Please use the input format specified. Type 'help' for more information."<<endl;
+			}
+			//change from chess coords to array coords
+			if(coordinate_switch(argument1, argument2)){
+				//make the move
+				board[final_args[0]][final_args[1]]->do_move(final_args[2], final_args[3]);
+			}
+			else{
+				cout<<"Error: Invalid coordinates"<<endl;
+			}
 		}
-		else{
-			cout<<"Error: Invalid coordinates"<<endl;
-		}
+		else cout<<"Please use the input format specified. Type 'help' for more information."<<endl;
+		
+		
 	}
 	else if(command == "sumo"){
 		//parse arguments
