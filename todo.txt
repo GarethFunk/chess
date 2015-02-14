@@ -1,5 +1,4 @@
 Bugs
--anything but a comma breaks move input
 
 
 Basic Gameplay
@@ -15,13 +14,6 @@ X	-both players agree
 	-no capture or pawn move in the last fifty moves
 	-the same board has occurred three times with the same player to move and all pieces having the same rights to move including castling and en passant capture
 X-resigning 
-
-
-
-Advanced gameplay mechanics
-	X-Pawns: En Passant capture
-	-Castling
-	-pawn promotion
 
 Chess Engine
 	-Board scoring

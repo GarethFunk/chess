@@ -65,7 +65,7 @@ void initialise(){
 	board[7][3] = new Queen(7, 3, white);	//queen
 	board[7][4] = new King(7, 4, white);	//king
 	board[7][5] = new Bishop(7, 5, white);	//bishop
-	board[7][6] = new King(7, 6, white);	//knight
+	board[7][6] = new Knight(7, 6, white);	//knight
 	board[7][7] = new Rook(7, 7, white);	//rook
 	//Black back row
 	board[0][0] = new Rook(0, 0, black);	//rook

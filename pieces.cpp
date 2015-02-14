@@ -184,10 +184,6 @@ public:
 		type = pawn;
 		value = 1;
 	}
-	Pawn(){
-		type = pawn;
-		value = 1;
-	}
 };
 
 class Rook: public piece {
@@ -247,10 +243,6 @@ public:
 		type = rook;
 		value = 5;
 	}
-	Rook(){
-		type = rook;
-		value = 5;
-	}
 };
 
 class Knight: public piece {
@@ -275,10 +267,6 @@ public:
 		rank = a;
 		file = b;
 		colour = y;
-		type = knight;
-		value = 3;
-	}
-	Knight(){
 		type = knight;
 		value = 3;
 	}
@@ -361,11 +349,6 @@ public:
 		colour = y;
 		type = bishop;
 		int square_colour = squares[a][b];
-		value = 3;
-	}
-	Bishop(){
-		type = bishop;
-		int square_colour = squares[rank][file];
 		value = 3;
 	}
 };
@@ -484,17 +467,97 @@ public:
 		type = queen;
 		value = 9;
 	}
-	Queen(){
-		type = queen;
-		value = 9;
-	}
 };
 
 class King: public piece {
+private:
+	bool castling(int x, int y){
+		//castling
+		if(abs(y - file) == 2 && rank == x && !checkcheck(colour) && move_count == 0){	//valid castling move and not in check and not previously moved
+			if(y < file){	//queenside 
+				if(board[rank][0]->move_count == 0){	//rook not moved
+					if(board[rank][3] != NULL || checkcheck(colour, rank, file, rank, 3)) return false;	//a square in between king and rook is either filled or in check
+					if(board[rank][2] != NULL || checkcheck(colour, rank, file, rank, 2)) return false;	//a square in between king and rook is either filled or in check
+					if(board[rank][1] != NULL) return false; //path to rook not empty
+				}
+				else return false;	// rook moved
+			}
+			else{		//kingside
+				if(board[rank][7]->move_count == 0){	//rook not moved
+					if(board[rank][5] != NULL || checkcheck(colour, rank, file, rank, 5)) return false;	//a square in between king and rook is either filled or in check
+					if(board[rank][6] != NULL || checkcheck(colour, rank, file, rank, 6)) return false;	//a square in between king and rook is either filled or in check
+				}
+				else return false;
+			}
+			return true;	//all conditions satisfied
+		}
+		return false;
+	}
+
 public: 
+	virtual bool do_move(int x, int y){
+		if(colour == turn){		//Check piece is allowed to move on this turn
+			if(islegal(x, y)){		//Check move is legal
+				if(checkcheck(colour, rank, file, x, y)){ //if the proposed move puts you in check
+					cout<<"Move would result with you in check"<<endl;
+					return false;
+				}
+				else{		//move does not put you in check
+					//update piece properties and make the move
+					if(board[x][y] != NULL) delete board[x][y];	//delete captured piece
+					board[x][y] = board[rank][file];
+					board[rank][file] = NULL;
+					rank = x;
+					file = y;
+					move_count++;
+					draw_board();
+					turn = !turn;
+					turn_counter++;
+					check_flag = checkcheck(!colour); //check if other team is now in check
+					return true;
+				}
+			}
+			else if(castling(x, y)){
+				if(y > rank){		//queenside move rook
+					board[rank][3] = board[rank][0];
+					board[rank][0] = NULL;
+					board[rank][3]->file = 3;
+					board[rank][3]->move_count++;
+				}
+				else{	//kingside move rook
+					board[rank][5] = board[rank][7];
+					board[rank][7] = NULL;
+					board[rank][5]->file = 5;
+					board[rank][5]->move_count++;
+				}
+				//update king's position & properties
+				board[x][y] = board[rank][file];
+				board[rank][file] = NULL;
+				rank = x;
+				file = y;
+				move_count++;
+				draw_board();
+				turn = !turn;
+				turn_counter++;
+				check_flag = checkcheck(!colour); //check if other team is now in check
+				return true;
+			}
+			else{
+				cout<<"Move not legal"<<endl;
+				return false;
+			}
+		}	
+		else{
+			cout<<"It is not your turn!"<<endl;
+			return false;
+		}
+	}
+
+
 	virtual bool islegal(int x, int y){
 		piece* target_piece = board[x][y];
 		//Piece specific moves
+		//normal moves
 		if(target_piece == NULL || target_piece->colour != colour){ //Check target square is either empty or has enemy piece on it
 			if(abs(rank - x) <= 1 && abs(file - y) <= 1){
 				return true;
