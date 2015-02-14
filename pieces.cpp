@@ -12,20 +12,23 @@ public:
 		cout<<"Error: method for checking legality not found"<<endl;
 		return false;
 	}
-	vector<a_move> getmoves(){
+	virtual vector<a_move> getmoves(bool display){
+		cout<<"No method found for getmoves(bool display). Using brute force."<<endl;
 		vector<a_move> all_moves;
-		for(int i = rank -1; i <=rank + 1; i++){
-			for(int j = file -1; j <= file + 1; j++){
-				if(i >= 0 && i <=7 && j>=0 && j<=7 && islegal(i, j) && checkcheck(colour, rank, file, i, j) == false){	
+		for(int i = 0; i <=7; i++){
+			for(int j = 0; j <=7; j++){
+				if(islegal(i, j) && checkcheck(colour, rank, file, i, j) == false){	
 				//If the move is a valid coordinate and is legal and does not result in check. 
 					all_moves.push_back({rank, file, i, j});
 				}
 			}
 		}
-		/*cout<<"piece at "<<rank<<" "<<file<<" can move: "<<endl;
-		for(int i = 0; i < all_moves.size(); i++){
-			cout<<all_moves[i].x<<" "<<all_moves[i].y<<endl;
-		}*/
+		if(display){
+			cout<<"piece at "<<rank<<" "<<file<<" can move: "<<endl;
+			for(int i = 0; i < all_moves.size(); i++){
+				cout<<all_moves[i].x<<" "<<all_moves[i].y<<endl;
+			}
+		}
 		return all_moves;
 	}
 
@@ -117,46 +120,46 @@ private:
 
 public: 
 	virtual bool do_move(int x, int y){
-	if(colour == turn){		//Check piece is allowed to move on this turn
-		if(islegal(x, y)){		//Check move is legal
-			if(checkcheck(colour, rank, file, x, y)){ //if the proposed move puts you in check
-				cout<<"Move would result with you in check"<<endl;
+		if(colour == turn){		//Check piece is allowed to move on this turn
+			if(islegal(x, y)){		//Check move is legal
+				if(checkcheck(colour, rank, file, x, y)){ //if the proposed move puts you in check
+					cout<<"Move would result with you in check"<<endl;
+					return false;
+				}
+				else{		//move does not put you in check
+					//update piece properties and make the move
+					if(board[x][y] != NULL) delete board[x][y];	//delete captured piece
+					board[x][y] = board[rank][file];
+					board[rank][file] = NULL;
+					if(en_passant(x, y)) delete board[rank][y];	//make en passant capture if eligible
+					//update piece properties
+					rank = x;
+					file = y;
+					move_count++;
+					if(eligible_for_promotion(x)){
+						int new_type;
+						cout<<"Choose which piece you would like to promote your pawn to\n1\tRook\n2\tKnight\n3\tBishop\n4\tQueen"<<endl;
+						do{
+							cin>>new_type;				
+						} while(!promote(new_type));
+					}
+					draw_board();
+					turn = !turn;
+					turn_counter++;
+					check_flag = checkcheck(!colour); //check if other team is now in check
+					return true;
+				}
+			}
+			else{
+				cout<<"Move not legal"<<endl;
 				return false;
 			}
-			else{		//move does not put you in check
-				//update piece properties and make the move
-				if(board[x][y] != NULL) delete board[x][y];	//delete captured piece
-				board[x][y] = board[rank][file];
-				board[rank][file] = NULL;
-				if(en_passant(x, y)) delete board[rank][y];	//make en passant capture if eligible
-				//update piece properties
-				rank = x;
-				file = y;
-				move_count++;
-				if(eligible_for_promotion(x)){
-					int new_type;
-					cout<<"Choose which piece you would like to promote your pawn to\n1\tRook\n2\tKnight\n3\tBishop\n4\tQueen"<<endl;
-					do{
-						cin>>new_type;				
-					} while(!promote(new_type));
-				}
-				draw_board();
-				turn = !turn;
-				turn_counter++;
-				check_flag = checkcheck(!colour); //check if other team is now in check
-				return true;
-			}
-		}
+		}	
 		else{
-			cout<<"Move not legal"<<endl;
+			cout<<"It is not your turn!"<<endl;
 			return false;
 		}
-	}	
-	else{
-		cout<<"It is not your turn!"<<endl;
-		return false;
 	}
-}
 	virtual bool islegal(int x, int y){
 		piece* target_piece = board[x][y];
 		if(target_piece == NULL || target_piece->colour != colour){ //Check target square is either empty or has enemy piece on it
@@ -176,6 +179,24 @@ public:
 			}	
 		}
 		else return false;
+	}
+	virtual vector<a_move> getmoves(bool display){
+		vector<a_move> all_moves;
+		for(int i = rank -2; i <=rank + 2; i++){
+			for(int j = file -1; j <= file + 1; j++){
+				if(i >= 0 && i <=7 && j>=0 && j<=7 && islegal(i, j) && checkcheck(colour, rank, file, i, j) == false){	
+				//If the move is a valid coordinate and is legal and does not result in check. 
+					all_moves.push_back({rank, file, i, j});
+				}
+			}
+		}
+		if(display){
+			cout<<"piece at "<<rank<<" "<<file<<" can move: "<<endl;
+			for(int i = 0; i < all_moves.size(); i++){
+				cout<<all_moves[i].x<<" "<<all_moves[i].y<<endl;
+			}
+		}
+		return all_moves;
 	}
 	Pawn(int a, int b, int y){
 		rank = a;
@@ -235,7 +256,24 @@ public:
 			return false; //target square has friendly piece on it
 		}
 	}
-
+	virtual vector<a_move> getmoves(bool display){
+		vector<a_move> all_moves;
+		for(int i = rank -2; i <=rank + 2; i++){
+			for(int j = file -1; j <= file + 1; j++){
+				if(i >= 0 && i <=7 && j>=0 && j<=7 && islegal(i, j) && checkcheck(colour, rank, file, i, j) == false){	
+				//If the move is a valid coordinate and is legal and does not result in check. 
+					all_moves.push_back({rank, file, i, j});
+				}
+			}
+		}
+		if(display){
+			cout<<"piece at "<<rank<<" "<<file<<" can move: "<<endl;
+			for(int i = 0; i < all_moves.size(); i++){
+				cout<<all_moves[i].x<<" "<<all_moves[i].y<<endl;
+			}
+		}
+		return all_moves;
+	}
 	Rook(int a, int b, int y){
 		rank = a;
 		file = b;
@@ -262,7 +300,24 @@ public:
 			return false; //target square already has friendly piece on it
 		}
 	}
-
+	virtual vector<a_move> getmoves(bool display){
+		vector<a_move> all_moves;
+		for(int i = rank -2; i <=rank + 2; i++){
+			for(int j = file -1; j <= file + 1; j++){
+				if(i >= 0 && i <=7 && j>=0 && j<=7 && islegal(i, j) && checkcheck(colour, rank, file, i, j) == false){	
+				//If the move is a valid coordinate and is legal and does not result in check. 
+					all_moves.push_back({rank, file, i, j});
+				}
+			}
+		}
+		if(display){
+			cout<<"piece at "<<rank<<" "<<file<<" can move: "<<endl;
+			for(int i = 0; i < all_moves.size(); i++){
+				cout<<all_moves[i].x<<" "<<all_moves[i].y<<endl;
+			}
+		}
+		return all_moves;
+	}
 	Knight(int a, int b, int y){
 		rank = a;
 		file = b;
@@ -342,7 +397,24 @@ public:
 			return false; //target square has friendly piece on it
 		}
 	}
-
+	virtual vector<a_move> getmoves(bool display){
+		vector<a_move> all_moves;
+		for(int i = rank -2; i <=rank + 2; i++){
+			for(int j = file -1; j <= file + 1; j++){
+				if(i >= 0 && i <=7 && j>=0 && j<=7 && islegal(i, j) && checkcheck(colour, rank, file, i, j) == false){	
+				//If the move is a valid coordinate and is legal and does not result in check. 
+					all_moves.push_back({rank, file, i, j});
+				}
+			}
+		}
+		if(display){
+			cout<<"piece at "<<rank<<" "<<file<<" can move: "<<endl;
+			for(int i = 0; i < all_moves.size(); i++){
+				cout<<all_moves[i].x<<" "<<all_moves[i].y<<endl;
+			}
+		}
+		return all_moves;
+	}
 	Bishop(int a, int b, int y){
 		rank = a;
 		file = b;
@@ -459,7 +531,24 @@ public:
 			}
 		else return false; //target square already has friednly piece on it
 	}
-
+	virtual vector<a_move> getmoves(bool display){
+		vector<a_move> all_moves;
+		for(int i = rank -2; i <=rank + 2; i++){
+			for(int j = file -1; j <= file + 1; j++){
+				if(i >= 0 && i <=7 && j>=0 && j<=7 && islegal(i, j) && checkcheck(colour, rank, file, i, j) == false){	
+				//If the move is a valid coordinate and is legal and does not result in check. 
+					all_moves.push_back({rank, file, i, j});
+				}
+			}
+		}
+		if(display){
+			cout<<"piece at "<<rank<<" "<<file<<" can move: "<<endl;
+			for(int i = 0; i < all_moves.size(); i++){
+				cout<<all_moves[i].x<<" "<<all_moves[i].y<<endl;
+			}
+		}
+		return all_moves;
+	}
 	Queen(int a, int b, int y){
 		rank = a;
 		file = b;
@@ -518,7 +607,7 @@ public:
 				}
 			}
 			else if(castling(x, y)){
-				if(y > rank){		//queenside move rook
+				if(y < file){		//queenside move rook
 					board[rank][3] = board[rank][0];
 					board[rank][0] = NULL;
 					board[rank][3]->file = 3;
@@ -552,8 +641,6 @@ public:
 			return false;
 		}
 	}
-
-
 	virtual bool islegal(int x, int y){
 		piece* target_piece = board[x][y];
 		//Piece specific moves
@@ -565,6 +652,24 @@ public:
 			else return false; //move not of radius 1	
 		}
 		else return false; //target square already has frienly piece on it
+	}
+	virtual vector<a_move> getmoves(bool display){
+		vector<a_move> all_moves;
+		for(int i = rank -2; i <=rank + 2; i++){
+			for(int j = file -1; j <= file + 1; j++){
+				if(i >= 0 && i <=7 && j>=0 && j<=7 && (islegal(i, j) || castling(i, j)) && checkcheck(colour, rank, file, i, j) == false){	
+				//If the move is a valid coordinate and is legal and does not result in check. 
+					all_moves.push_back({rank, file, i, j});
+				}
+			}
+		}
+		if(display){
+			cout<<"piece at "<<rank<<" "<<file<<" can move: "<<endl;
+			for(int i = 0; i < all_moves.size(); i++){
+				cout<<all_moves[i].x<<" "<<all_moves[i].y<<endl;
+			}
+		}
+		return all_moves;
 	}
 	King (int a, int b, int y){
 		rank = a;

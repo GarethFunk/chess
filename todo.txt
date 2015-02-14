@@ -1,8 +1,9 @@
-Bugs
+Testing
+
+Bugs/Improvements
 
 
-Basic Gameplay
-X-detect checkmate
+Gameplay
 -detect stalemate
 	X-player not in check but no legal move
 	-no possibility of checkmate
@@ -12,12 +13,23 @@ X-detect checkmate
 		-king and bishop against king and bishop with both bishops of the same square colour
 X	-both players agree
 	-no capture or pawn move in the last fifty moves
-	-the same board has occurred three times with the same player to move and all pieces having the same rights to move including castling and en passant capture
-X-resigning 
+	-the same board has occurred three times with the same player to move and all pieces having the same rights to move including castling and en passant capture 
 
 Chess Engine
+	-wrtie getmoves() for
+		-pawn
+		-rook
+		-bishop
+		-knight
+		-queen
 	-Board scoring
 	-Permute next possible moves
 
-Recording games?
-Playing games from files?
+
+Recording/Playback
+	Recording games?
+	Playing games from files?
+
+
+Graphics..?
+

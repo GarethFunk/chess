@@ -1,73 +1,45 @@
 #include "header.h"
 
-int parse(string input){
-	int open, close, comma;
-	if(input.find("(") != -1 && input.find(")") != -1){
-		open = input.find_first_of("(");
-		close = input.find_last_of(")");
+int parse(string input){	//return states: -1 = quit game; 0 = failed to parse anything; 1 = parsed successfully;
+	//extract command
+	int open, close;
+	string arguments;
+	open = input.find_first_of("(");
+	close = input.find_last_of(")");
+	if(open != -1 && close != -1){	//found an open and close bracket
 		command = input;
-		command = command.erase(open, (command.length()-open));
+		command = command.erase(open, (command.length()-open));	//strip arguments off command
+		arguments = input;
+		arguments = arguments.erase(0, command.length()+1);	//remove command and first bracket
+		arguments = arguments.erase(arguments.length()-1, 1);//remove last bracket
+		//remove whitespace from arguments
+		std::string::iterator end_pos = std::remove(arguments.begin(), arguments.end(), ' ');
+		arguments.erase(end_pos, arguments.end());
+	}
+	else if(open == -1 && close == -1){	//no arguments
+		command = input;
 	}
 	else{
-		command = input;
+		cout<<"Confused by brackets..."<<endl;
+		return 0;
 	}
+
+	//do command
 	if(command == "move"){
-		//parse arguments
-		string arguments = input;
-		arguments = arguments.erase(0,open+1); //LENGTH TO ERASE DEPENDS ON LENGTH OF KEYWORD!
-		arguments = arguments.erase(arguments.length()-1, 1);
-		if(arguments.find_first_of(",") != -1){		//if comma found
-			comma = arguments.find_first_of(",");
-			string argument1 = arguments;
-			string argument2 = arguments;
-			argument1 = argument1.erase(2, argument1.length()-2);
-			switch(arguments.length()){
-				case 5: 	//no spaces
-					argument2 = argument2.erase(0, comma+1);
-					break;
-				case 6:		//assume one space after the comma.
-					argument2 = argument2.erase(0, comma +2);
-					break;
-				default:
-					cout<<"Please use the input format specified. Type 'help' for more information."<<endl;
-			}
-			//change from chess coords to array coords
-			if(coordinate_switch(argument1, argument2)){
-				//make the move
-				board[final_args[0]][final_args[1]]->do_move(final_args[2], final_args[3]);
-			}
-			else{
-				cout<<"Error: Invalid coordinates"<<endl;
-			}
-		}
-		else cout<<"Please use the input format specified. Type 'help' for more information."<<endl;
-		
-		
+		if(parse_arguments(arguments)) board[final_args[0]][final_args[1]]->do_move(final_args[2], final_args[3]);
 	}
 	else if(command == "sumo"){
-		//parse arguments
-		string arguments = input;
-		arguments = arguments.erase(0, 5); //LENGTH TO ERASE DEPENDS ON LENGTH OF KEYWORD!
-		arguments = arguments.erase(arguments.length()-1, 1);
-		comma = arguments.find_first_of(",");
-		string argument1 = arguments;
-		string argument2 = arguments;
-		argument1 = argument1.erase(2, argument1.length()-2);
-		argument2 = argument2.erase(0, comma+1);
-		//change from chess coords to array coords
-		if(coordinate_switch(argument1, argument2)){
-			board[final_args[0]][final_args[1]]->do_move(final_args[2], final_args[3], true);
-		}
-		else{
-			cout<<"Error: Invalid coordinates (refers to an invalid location)"<<endl;
-		}
+		if(parse_arguments(arguments)) board[final_args[0]][final_args[1]]->do_move(final_args[2], final_args[3], true);
+	}
+	else if(command == "lsmv"){
+		if(parse_arguments(arguments)) board[final_args[0]][final_args[1]]->getmoves(true);
 	}
 
 	else if(command == "help"){
 		cout<<	"move(x1,y2)\tMoves the piece at x1 to y2\n"<<
-				"stalemate\tDeclares a stalemate to which both players must agree\n"<<
-				"resign\t\tResign from the game. The other player will win\n"<<
-				"exit\t\tQuits the program and returns to the terminal\n"<<endl;
+		"stalemate\tDeclares a stalemate to which both players must agree\n"<<
+		"resign\t\tResign from the game. The other player will win\n"<<
+		"exit\t\tQuits the program and returns to the terminal\n"<<endl;
 	}
 	else if(command == "exit"){
 		return -1;
@@ -119,40 +91,41 @@ int parse(string input){
 	return 1;
 }
 
-bool coordinate_switch(string a, string b){
-	if(a.length() == 2 && b.length() == 2){
-		char *arg11 = &a[0];
-		char *arg12 = &a[1];
-		char *arg21 = &b[0];
-		char *arg22 = &b[1];
-		char args[4];
-		args[0] = *arg11;
-		args[1] = *arg12;
-		args[2] = *arg21;
-		args[3] = *arg22;
-		final_args[0] = 7 - (args[1] - '0' -1);
-		final_args[1] = args[0] - 97;
-		final_args[2] = 7 - (args[3] - '0' -1);
-		final_args[3] = args[2] - 97;
-		int j = 0;			//counter to check all arguments are valid.
-		for(int i = 0; i<4; i++){
-			if(final_args[i] >= 0 && final_args[i] <= 7){
-				j++;
-			}
-			else{
-				return false;
-			}
-		}
-		if(j == 4 && board[final_args[0]][final_args[1]] != NULL){
-			return true;
-		}
-		else{
-			return false;
-		}
+bool coordinate_switch(string a, int start_pos){	//only give string of length 2
+	char *arg11 = &a[0];
+	char *arg12 = &a[1];
+	char args[2];
+	args[0] = *arg11;
+	args[1] = *arg12;
+	final_args[start_pos] = 7 - (args[1] - '0' -1);	//convert rank
+	final_args[start_pos + 1] = args[0] - 97;		//convert file
+	//check arguments are refer to locations on the board.
+	if(final_args[start_pos] < 0 || final_args[start_pos] > 7 || final_args[start_pos+1] < 0 || final_args[start_pos+1] > 7){
+		cout<<"Coordinates specified do not lie on the board"<<endl;
+		return false;
 	}
-	else{
-		cout<<"Error: Invalid coordinates"<<endl;
-	}
+	return true;
 }
 
-
+bool parse_arguments(string arguments){	//give this function a comma separated list of arguments with no whitespace
+	int comma = 0;
+	int length = arguments.length();
+	for(int i = 0; i<length; i++){
+		if(arguments[i]==',') comma ++;
+	}
+	switch(comma){
+		case 0 :
+			if(coordinate_switch(arguments, 0) && board[final_args[0]][1] != NULL) return true;
+			else if(board[0][1] == NULL) cout<<"Error: There is nothing at the specified coordinate"<<endl;
+			return false;
+			break;
+		case 1 :
+			if(coordinate_switch(arguments.substr(0,2), 0) && coordinate_switch(arguments.substr(3,2), 2) && board[final_args[0]][1] != NULL) return true;
+			else if(board[0][1] == NULL) cout<<"Error: There is nothing at the specified target coordinate"<<endl;
+			return false;
+			break;
+		default :
+			cout<<"Too many commas in input arguments."<<endl;
+			return false;
+	}
+}

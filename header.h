@@ -4,6 +4,7 @@
 #include <string>
 #include <cmath>
 #include <vector>
+#include <algorithm>
 #define white 0
 #define black 1
 
@@ -24,8 +25,9 @@ struct a_move {
 void draw_board();
 string get_rank(int rank);
 int parse(string input);
+bool parse_arguments(string arguments);
 void initialise();
-bool coordinate_switch(string a, string b);
+bool coordinate_switch(string a, int start_pos);
 int score_board(int colour);
 bool checkcheck(int colour);
 bool checkcheck(int colour, int rank, int file, int x, int y);
@@ -34,12 +36,11 @@ bool checkcheckmate(int colour);
 bool checkstalemate(int colour);
 
 //Variables
-string command;
-int final_args[4];
 bool turn = white; //use turn = !turn to switch //white == 0; black == 1;
 int turn_counter; 
 bool check_flag = false;
-
+string command;
+int final_args[4];
 
 
 #include "pieces.cpp"
@@ -256,7 +257,7 @@ bool checkcheckmate(int colour){	//only call this function if the specified colo
 			//cout<<"Checking "<<rank<<" "<<file<<endl;
 			if(board[rank][file] != NULL && board[rank][file]->colour == colour){	//If there is a piece on this square and it is of the same colour
 				//if there is a legal move which results in you not being in check => not checkmate
-				piece_moves = board[rank][file]->getmoves();
+				piece_moves = board[rank][file]->getmoves(false);
 				if(piece_moves.size() != 0) return false;
 			}
 		}
@@ -271,7 +272,7 @@ bool checkstalemate(int colour){	//only call this if not in check
 		for(int j = 0; j < 8; j++){
 			if(board[i][j] != NULL && board[i][j]->colour == colour){	//found a piece of the correct colour
 				//check to see if this piece has any legal moves
-				piece_moves = board[i][j]->getmoves();
+				piece_moves = board[i][j]->getmoves(false);
 				if(piece_moves.size() != 0) return false;
 			}
 		}
