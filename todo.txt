@@ -16,12 +16,6 @@ X	-both players agree
 	-the same board has occurred three times with the same player to move and all pieces having the same rights to move including castling and en passant capture 
 
 Chess Engine
-	-wrtie getmoves() for
-		-pawn
-		-rook
-		-bishop
-		-knight
-		-queen
 	-Board scoring
 	-Permute next possible moves
 

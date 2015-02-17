@@ -115,13 +115,13 @@ bool parse_arguments(string arguments){	//give this function a comma separated l
 	}
 	switch(comma){
 		case 0 :
-			if(coordinate_switch(arguments, 0) && board[final_args[0]][1] != NULL) return true;
-			else if(board[0][1] == NULL) cout<<"Error: There is nothing at the specified coordinate"<<endl;
+			if(coordinate_switch(arguments, 0) && board[final_args[0]][final_args[1]] != NULL) return true;
+			else if(board[final_args[0]][final_args[1]] == NULL) cout<<"Error: There is nothing at the specified coordinate"<<endl;
 			return false;
 			break;
 		case 1 :
-			if(coordinate_switch(arguments.substr(0,2), 0) && coordinate_switch(arguments.substr(3,2), 2) && board[final_args[0]][1] != NULL) return true;
-			else if(board[0][1] == NULL) cout<<"Error: There is nothing at the specified target coordinate"<<endl;
+			if(coordinate_switch(arguments.substr(0,2), 0) && coordinate_switch(arguments.substr(3,2), 2) && board[final_args[0]][final_args[1]] != NULL) return true;
+			else if(board[final_args[0]][final_args[1]] == NULL) cout<<"Error: There is nothing at the specified target coordinate"<<endl;
 			return false;
 			break;
 		default :
