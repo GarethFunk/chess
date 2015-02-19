@@ -15,6 +15,7 @@ int parse(string input){	//return states: -1 = quit game; 0 = failed to parse an
 		//remove whitespace from arguments
 		std::string::iterator end_pos = std::remove(arguments.begin(), arguments.end(), ' ');
 		arguments.erase(end_pos, arguments.end());
+		
 	}
 	else if(open == -1 && close == -1){	//no arguments
 		command = input;
@@ -26,15 +27,14 @@ int parse(string input){	//return states: -1 = quit game; 0 = failed to parse an
 
 	//do command
 	if(command == "move"){
-		if(parse_arguments(arguments)) board[final_args[0]][final_args[1]]->do_move(final_args[2], final_args[3]);
-	}
-	else if(command == "sumo"){
-		if(parse_arguments(arguments)) board[final_args[0]][final_args[1]]->do_move(final_args[2], final_args[3], true);
-	}
-	else if(command == "lsmv"){
-		if(parse_arguments(arguments)) board[final_args[0]][final_args[1]]->getmoves(true);
-	}
-
+			if(parse_arguments(arguments)) board[final_args[0]][final_args[1]]->do_move(final_args[2], final_args[3]);
+		}
+		else if(command == "sumo"){
+			if(parse_arguments(arguments)) board[final_args[0]][final_args[1]]->do_move(final_args[2], final_args[3], true);
+		}
+		else if(command == "lsmv"){
+			if(parse_arguments(arguments)) board[final_args[0]][final_args[1]]->getmoves(true);
+		}
 	else if(command == "help"){
 		cout<<	"move(x1,y2)\tMoves the piece at x1 to y2\n"<<
 		"stalemate\tDeclares a stalemate to which both players must agree\n"<<
@@ -58,6 +58,20 @@ int parse(string input){	//return states: -1 = quit game; 0 = failed to parse an
 	}
 	else if(command == "turn"){
 		turn = !turn;
+	}
+	else if(command == "eng"){
+		engine_move(turn);
+	}
+	else if(command == "score"){
+		cout<<"Score is "<<evaluate(turn)<<endl;
+	}
+	else if(command == "almv"){
+		vector<a_move> turn_moves = get_all_moves(turn);
+		cout<<"All possible moves for your team:"<<endl;
+		int sizzzze = turn_moves.size();
+		for(int i = 0; i < sizzzze; i++){
+			cout<<turn_moves[i].rank<<" "<<turn_moves[i].file<<" to "<<turn_moves[i].x<<" "<<turn_moves[i].y<<". Score = "<<turn_moves[i].score<<endl;
+		}
 	}
 	else if(command == "stalemate"){
 		char ans;

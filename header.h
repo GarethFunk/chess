@@ -7,7 +7,7 @@
 #include <algorithm>
 #define white 0
 #define black 1
-
+#define ENGINE_DEPTH 3	
 
 using namespace std;
 
@@ -34,6 +34,11 @@ bool checkcheck(int colour, int rank, int file, int x, int y);
 bool checkcheck(int colour, a_move target_move);
 bool checkcheckmate(int colour);
 bool checkstalemate(int colour);
+//engine functions
+bool engine_move(int colour);
+vector<a_move> get_all_moves(int colour);
+int evaluate(int colour);
+int minimax(a_move node, int depth, int colour);
 
 //Variables
 bool turn = white; //use turn = !turn to switch //white == 0; black == 1;
@@ -41,11 +46,13 @@ int turn_counter;
 bool check_flag = false;
 string command;
 int final_args[4];
+int chess_board_score;
 
 
+#include "piecetables.cpp"
 #include "pieces.cpp"
 
-bool Pawn::promote(int new_type){
+bool Pawn::promote(int new_type){		//defined here because uses classes defined in pieces.cpp (included above this line)
 	//create new object
 	//insert address of new object into array
 	switch(new_type){
@@ -231,17 +238,23 @@ bool checkcheck(int colour){
 bool checkcheck(int colour, int rank, int file, int x, int y){	//ONLY GIVE THIS FUNCTION LEGAL COORDINATES
 	piece* piece_buffer = board[x][y];
 	board[x][y] = board[rank][file];
+	board[x][y]->rank = x;
+	board[x][y]->file = y;
 	board[rank][file] = NULL;
 	//cout<<"Moved pieces"<<endl;
 	if(checkcheck(board[x][y]->colour)){ //if the proposed move would result in check
 		//reset pieces to how they were
 		board[rank][file] = board[x][y];
 		board[x][y] = piece_buffer;
+		board[rank][file]->rank = rank;
+		board[rank][file]->file = file;
 		return true;
 	}
 	else{	//reset pieces to how they were
 		board[rank][file] = board[x][y];
 		board[x][y] = piece_buffer;
+		board[rank][file]->rank = rank;
+		board[rank][file]->file = file;
 		return false;
 	}
 }
@@ -250,7 +263,7 @@ bool checkcheck(int colour, a_move target_move){
 	return checkcheck(colour, target_move.rank, target_move.file, target_move.x, target_move.y);
 }
 
-bool checkcheckmate(int colour){	//only call this function if the specified colour is in check! 
+bool checkcheckmate(int colour){	//only call this function if the specified colour is in check! otherwise might be stalemate!
 	vector<a_move> piece_moves;
 	for(int rank = 0; rank < 8; rank++){
 		for(int file = 0; file < 8; file++){
@@ -266,7 +279,7 @@ bool checkcheckmate(int colour){	//only call this function if the specified colo
 	return true;
 }
 
-bool checkstalemate(int colour){	//only call this if not in check
+bool checkstalemate(int colour){	//only call this if NOT in check! otherwise might be checkmate!
 	vector<a_move> piece_moves;
 	for(int i = 0; i < 8; i++){
 		for(int j = 0; j < 8; j++){
@@ -280,6 +293,170 @@ bool checkstalemate(int colour){	//only call this if not in check
 	//check all pieces of given colour, none had any legal moves.
 	return true;
 }	
+
+bool engine_move(int colour){
+	vector<a_move> turn_moves = get_all_moves(colour);
+	int num_moves = turn_moves.size();
+	int best_move;
+	int best_value_white = std::numeric_limits<int>::min();
+	int best_value_black = std::numeric_limits<int>::max();
+	for(int i = 0; i < num_moves; i++){
+		turn_moves[i].score = minimax(turn_moves[i], ENGINE_DEPTH, colour);
+		cout<<"Move "<<i<<" out of "<<num_moves<<" has score "<<turn_moves[i].score<<endl;
+		if(colour == white){	//maximise
+			if(turn_moves[i].score > best_value_white){
+				best_value_white = turn_moves[i].score;
+				best_move = i;
+			}
+		}
+		if(colour == black){	//minimise
+			if(turn_moves[i].score < best_value_black){
+				best_value_black = turn_moves[i].score;
+				best_move = i;
+			}
+		}
+	}	
+	//cout<<"All possible moves for your team:"<<endl;
+	/*int sizzzze = turn_moves.size();
+	for(int i = 0; i < sizzzze; i++){
+		cout<<turn_moves[i].rank<<" "<<turn_moves[i].file<<" to "<<turn_moves[i].x<<" "<<turn_moves[i].y<<". Score = "<<turn_moves[i].score<<endl;
+	}*/
+	cout<<"Best move is "<<turn_moves[best_move].rank<<" "<<turn_moves[best_move].file<<" to "<<turn_moves[best_move].x<<" "<<turn_moves[best_move].y<<". Score = "<<turn_moves[best_move].score<<endl;
+	board[turn_moves[best_move].rank][turn_moves[best_move].file]->do_move(turn_moves[best_move].x, turn_moves[best_move].y);
+}
+
+int minimax(a_move node, int depth, int colour){
+	int best_value;
+	int i;
+	//make the move
+	piece* piece_buffer = board[node.x][node.y];
+	board[node.x][node.y] = board[node.rank][node.file];
+	board[node.x][node.y]->rank = node.x;
+	board[node.x][node.y]->file = node.y;
+	board[node.rank][node.file] = NULL;
+	//draw_board();
+	//get new moves
+	if(depth == 0){
+		//undo the move
+		//cout<<"Reached the bottom of the tree"<<endl;
+		int score = evaluate(colour);
+		board[node.rank][node.file] = board[node.x][node.y];
+		board[node.x][node.y] = piece_buffer;
+		board[node.rank][node.file]->rank = node.rank;
+		board[node.rank][node.file]->file = node.file;
+		return score;
+	}
+	//cout<<"Getting Level "<<depth<<" moves..."<<endl;
+	vector<a_move> turn_moves = get_all_moves(!colour);	//get moves for next player's turn
+	int num_moves = turn_moves.size();
+	if(num_moves == 0){
+		//undo the move
+		//cout<<"This is a terminal node"<<endl;
+		int score = evaluate(colour);
+		board[node.rank][node.file] = board[node.x][node.y];
+		board[node.x][node.y] = piece_buffer;
+		board[node.rank][node.file]->rank = node.rank;
+		board[node.rank][node.file]->file = node.file;
+		return score;
+	}
+	if(colour == white){
+		best_value = std::numeric_limits<int>::max();
+		for(i = 0; i<num_moves; i++){
+			//cout<<"Calling minimax at depth "<<depth<<" move "<<i+1<<" of "<<num_moves<<" for white"<<endl;
+			int val = minimax(turn_moves[i], depth-1, black);
+			if(val < best_value){
+				best_value = val;
+			}
+		}
+		//undo the move
+		board[node.rank][node.file] = board[node.x][node.y];
+		board[node.x][node.y] = piece_buffer;
+		board[node.rank][node.file]->rank = node.rank;
+		board[node.rank][node.file]->file = node.file;
+		return best_value;
+	}
+	else{
+		best_value = std::numeric_limits<int>::min();
+		for(i = 0; i<num_moves; i++){
+			//cout<<"Calling minimax at depth "<<depth<<" move "<<i+1<<" of "<<num_moves<<" for black"<<endl;
+			int val = minimax(turn_moves[i], depth-1, white);
+			if(val > best_value){
+				best_value = val;
+			}
+		}
+		//undo the move
+		board[node.rank][node.file] = board[node.x][node.y];
+		board[node.x][node.y] = piece_buffer;
+		board[node.rank][node.file]->rank = node.rank;
+		board[node.rank][node.file]->file = node.file;
+		return best_value;
+	}
+}
+
+vector<a_move> get_all_moves(int colour){
+	vector<a_move> turn_moves;
+	//get list of moves we could make
+	for(int i = 0; i < 8; i++){
+		for(int j = 0; j < 8; j++){
+			if(board[i][j] != NULL && board[i][j]->colour == colour){
+				//cout<<"checking square "<<i<<" "<<j<<" for possible moves"<<endl;
+				vector<a_move> current_square_moves = board[i][j]->getmoves(false);
+				turn_moves.insert(turn_moves.end(), current_square_moves.begin(), current_square_moves.end());
+			}			
+		}
+	}
+	return turn_moves;
+}
+
+int evaluate(int colour){
+	int score = 0;
+	int r, f;
+	for(int i = 0; i < 8; i++){
+		for(int j = 0; j < 8; j++){
+			if(board[i][j] != NULL){
+				//Caclulate material value
+				score += board[i][j]->value;
+				//cout<<"Piece worth "<<board[i][j]->value<<endl;
+				//calculate position value
+				if(board[i][j]->colour == black){
+					//switch coordinates for position value lookup
+					r = 7-i;
+					f = j;
+				}
+				else{
+					r = i;
+					f = j;
+				}
+				int position = 0;
+				switch(board[i][j]->type){
+					case pawn :
+						position = pawn_table[r][f];
+						break;
+					case knight :
+						position = knight_table[r][f];
+						break;
+					case bishop :
+						position = bishop_table[r][f];
+						break;
+					case king :
+						position = king_table[r][f];
+						break;
+					default:
+						break;
+				}
+				//cout<<"Piece position = "<<position<<endl;
+				if(board[i][j]->colour == black) score -= position;
+				else score += position;
+				//mobility
+
+				//bonuses
+
+			}
+		}			
+	}
+	return score;
+
+}
 
 
 #endif

@@ -205,7 +205,8 @@ public:
 		file = b;
 		colour = y;
 		type = pawn;
-		value = 1;
+		if(colour == black) value = -100;
+		else value = 100;
 	}	
 };
 
@@ -265,8 +266,8 @@ public:
 		i = file - 1;
 		for(i; i>=0; i--){
 			if(board[rank][i] == NULL && checkcheck(colour, rank, file, rank, i) == false) all_moves.push_back({rank, file, rank, i});	//empty legal place to go
-			else if(board[rank][i] != NULL && board[rank][i]->colour != colour && checkcheck(colour, rank, file, rank, i) == false){	//enemy piece in the way
-				all_moves.push_back({rank, file, rank, i});
+			else if(board[rank][i] != NULL && board[rank][i]->colour != colour){	//enemy piece in the way
+				if(checkcheck(colour, rank, file, rank, i) == false) all_moves.push_back({rank, file, rank, i});
 				break;
 			}
 			else if(board[rank][i] != NULL && board[rank][i]->colour == colour) break;	//come accross a friendly piece in the way
@@ -275,8 +276,8 @@ public:
 		i = file +1;
 		for(i; i<8; i++){
 			if(board[rank][i] == NULL && checkcheck(colour, rank, file, rank, i) == false) all_moves.push_back({rank, file, rank, i});	//empty legal place to go
-			else if(board[rank][i] != NULL && board[rank][i]->colour != colour && checkcheck(colour, rank, file, rank, i) == false){	//enemy piece in the way
-				all_moves.push_back({rank, file, rank, i});
+			else if(board[rank][i] != NULL && board[rank][i]->colour != colour){	//enemy piece in the way
+				if(checkcheck(colour, rank, file, rank, i) == false) all_moves.push_back({rank, file, rank, i});
 				break;
 			}
 			else if(board[rank][i] != NULL && board[rank][i]->colour == colour) break;	//come accross a friendly piece in the way
@@ -285,8 +286,8 @@ public:
 		i = rank + 1;
 		for(i; i<8; i++){
 			if(board[i][file] == NULL && checkcheck(colour, rank, file, i, file) == false) all_moves.push_back({rank, file, i, file});	//empty legal place to go
-			else if(board[i][file] != NULL && board[i][file]->colour != colour && checkcheck(colour, rank, file, i, file) == false){	//enemy piece in the way
-				all_moves.push_back({rank, file, i, file});
+			else if(board[i][file] != NULL && board[i][file]->colour != colour){	//enemy piece in the way
+				if(checkcheck(colour, rank, file, i, file) == false) all_moves.push_back({rank, file, i, file});
 				break;
 			}
 			else if(board[i][file] != NULL && board[i][file]->colour == colour) break;	//come accross a friendly piece in the way
@@ -295,8 +296,8 @@ public:
 		i = rank - 1;
 		for(i; i>=0; i--){
 			if(board[i][file] == NULL && checkcheck(colour, rank, file, i, file) == false) all_moves.push_back({rank, file, i, file});	//empty legal place to go
-			else if(board[i][file] != NULL && board[i][file]->colour != colour && checkcheck(colour, rank, file, i, file) == false){	//enemy piece in the way
-				all_moves.push_back({rank, file, i, file});
+			else if(board[i][file] != NULL && board[i][file]->colour != colour){	//enemy piece in the way
+				if(checkcheck(colour, rank, file, i, file) == false) all_moves.push_back({rank, file, i, file});
 				break;
 			}
 			else if(board[i][file] != NULL && board[i][file]->colour == colour) break;	//come accross a friendly piece in the way
@@ -314,7 +315,8 @@ public:
 		file = b;
 		colour = y;
 		type = rook;
-		value = 5;
+		if(colour == black) value = -500;
+		else value = 500;
 	}
 };
 
@@ -366,7 +368,8 @@ public:
 		file = b;
 		colour = y;
 		type = knight;
-		value = 3;
+		if(colour == black) value = -320;
+		else value = 320;
 	}
 };
 
@@ -448,8 +451,8 @@ public:
 		j = file + 1;
 		while(i>=0 && j<8){
 			if(board[i][j] == NULL && checkcheck(colour, rank, file, i, j) == false) all_moves.push_back({rank, file, i, j});	//empty legal place to go
-			else if(board[i][j] != NULL && board[i][j]->colour != colour && checkcheck(colour, rank, file, i, j) == false){	//enemy piece in the way
-				all_moves.push_back({rank, file, i, j});
+			else if(board[i][j] != NULL && board[i][j]->colour != colour){	//enemy piece in the way
+				if(checkcheck(colour, rank, file, i, j) == false) all_moves.push_back({rank, file, i, j});
 				break;
 			}
 			else if(board[i][j] != NULL && board[i][j]->colour == colour) break;	//come accross a friendly piece in the way
@@ -461,8 +464,8 @@ public:
 		j = file - 1;
 		while(i>=0 && j>=0){
 			if(board[i][j] == NULL && checkcheck(colour, rank, file, i, j) == false) all_moves.push_back({rank, file, i, j});	//empty legal place to go
-			else if(board[i][j] != NULL && board[i][j]->colour != colour && checkcheck(colour, rank, file, i, j) == false){	//enemy piece in the way
-				all_moves.push_back({rank, file, i, j});
+			else if(board[i][j] != NULL && board[i][j]->colour != colour){	//enemy piece in the way
+				if(checkcheck(colour, rank, file, i, j) == false) all_moves.push_back({rank, file, i, j});
 				break;
 			}
 			else if(board[i][j] != NULL && board[i][j]->colour == colour) break;	//come accross a friendly piece in the way
@@ -475,8 +478,8 @@ public:
 		j = file + 1;
 		while(i<8 && j<8){
 			if(board[i][j] == NULL && checkcheck(colour, rank, file, i, j) == false) all_moves.push_back({rank, file, i, j});	//empty legal place to go
-			else if(board[i][j] != NULL && board[i][j]->colour != colour && checkcheck(colour, rank, file, i, j) == false){	//enemy piece in the way
-				all_moves.push_back({rank, file, i, j});
+			else if(board[i][j] != NULL && board[i][j]->colour != colour){	//enemy piece in the way
+				if(checkcheck(colour, rank, file, i, j) == false) all_moves.push_back({rank, file, i, j});
 				break;
 			}
 			else if(board[i][j] != NULL && board[i][j]->colour == colour) break;	//come accross a friendly piece in the way
@@ -488,8 +491,8 @@ public:
 		j = file - 1;
 		while(i<8 && j>=0){
 			if(board[i][j] == NULL && checkcheck(colour, rank, file, i, j) == false) all_moves.push_back({rank, file, i, j});	//empty legal place to go
-			else if(board[i][j] != NULL && board[i][j]->colour != colour && checkcheck(colour, rank, file, i, j) == false){	//enemy piece in the way
-				all_moves.push_back({rank, file, i, j});
+			else if(board[i][j] != NULL && board[i][j]->colour != colour){	//enemy piece in the way
+				if(checkcheck(colour, rank, file, i, j) == false) all_moves.push_back({rank, file, i, j});
 				break;
 			}
 			else if(board[i][j] != NULL && board[i][j]->colour == colour) break;	//come accross a friendly piece in the way
@@ -510,7 +513,8 @@ public:
 		colour = y;
 		type = bishop;
 		int square_colour = squares[a][b];
-		value = 3;
+		if(colour == black) value = -325;
+		else value = 325;
 	}
 };
 
@@ -628,8 +632,8 @@ public:
 		j = file + 1;
 		while(i>=0 && j<8){
 			if(board[i][j] == NULL && checkcheck(colour, rank, file, i, j) == false) all_moves.push_back({rank, file, i, j});	//empty legal place to go
-			else if(board[i][j] != NULL && board[i][j]->colour != colour && checkcheck(colour, rank, file, i, j) == false){	//enemy piece in the way
-				all_moves.push_back({rank, file, i, j});
+			else if(board[i][j] != NULL && board[i][j]->colour != colour){	//enemy piece in the way
+				if(checkcheck(colour, rank, file, i, j) == false) all_moves.push_back({rank, file, i, j});
 				break;
 			}
 			else if(board[i][j] != NULL && board[i][j]->colour == colour) break;	//come accross a friendly piece in the way
@@ -641,8 +645,8 @@ public:
 		j = file - 1;
 		while(i>=0 && j>=0){
 			if(board[i][j] == NULL && checkcheck(colour, rank, file, i, j) == false) all_moves.push_back({rank, file, i, j});	//empty legal place to go
-			else if(board[i][j] != NULL && board[i][j]->colour != colour && checkcheck(colour, rank, file, i, j) == false){	//enemy piece in the way
-				all_moves.push_back({rank, file, i, j});
+			else if(board[i][j] != NULL && board[i][j]->colour != colour){	//enemy piece in the way
+				if(checkcheck(colour, rank, file, i, j) == false) all_moves.push_back({rank, file, i, j});
 				break;
 			}
 			else if(board[i][j] != NULL && board[i][j]->colour == colour) break;	//come accross a friendly piece in the way
@@ -655,8 +659,8 @@ public:
 		j = file + 1;
 		while(i<8 && j<8){
 			if(board[i][j] == NULL && checkcheck(colour, rank, file, i, j) == false) all_moves.push_back({rank, file, i, j});	//empty legal place to go
-			else if(board[i][j] != NULL && board[i][j]->colour != colour && checkcheck(colour, rank, file, i, j) == false){	//enemy piece in the way
-				all_moves.push_back({rank, file, i, j});
+			else if(board[i][j] != NULL && board[i][j]->colour != colour){	//enemy piece in the way
+				if(checkcheck(colour, rank, file, i, j) == false) all_moves.push_back({rank, file, i, j});
 				break;
 			}
 			else if(board[i][j] != NULL && board[i][j]->colour == colour) break;	//come accross a friendly piece in the way
@@ -668,8 +672,8 @@ public:
 		j = file - 1;
 		while(i<8 && j>=0){
 			if(board[i][j] == NULL && checkcheck(colour, rank, file, i, j) == false) all_moves.push_back({rank, file, i, j});	//empty legal place to go
-			else if(board[i][j] != NULL && board[i][j]->colour != colour && checkcheck(colour, rank, file, i, j) == false){	//enemy piece in the way
-				all_moves.push_back({rank, file, i, j});
+			else if(board[i][j] != NULL && board[i][j]->colour != colour){	//enemy piece in the way
+				if(checkcheck(colour, rank, file, i, j) == false) all_moves.push_back({rank, file, i, j});
 				break;
 			}
 			else if(board[i][j] != NULL && board[i][j]->colour == colour) break;	//come accross a friendly piece in the way
@@ -680,8 +684,8 @@ public:
 		i = file - 1;
 		for(i; i>=0; i--){
 			if(board[rank][i] == NULL && checkcheck(colour, rank, file, rank, i) == false) all_moves.push_back({rank, file, rank, i});	//empty legal place to go
-			else if(board[rank][i] != NULL && board[rank][i]->colour != colour && checkcheck(colour, rank, file, rank, i) == false){	//enemy piece in the way
-				all_moves.push_back({rank, file, rank, i});
+			else if(board[rank][i] != NULL && board[rank][i]->colour != colour){	//enemy piece in the way
+				if(checkcheck(colour, rank, file, rank, i) == false) all_moves.push_back({rank, file, rank, i});
 				break;
 			}
 			else if(board[rank][i] != NULL && board[rank][i]->colour == colour) break;	//come accross a friendly piece in the way
@@ -690,8 +694,8 @@ public:
 		i = file +1;
 		for(i; i<8; i++){
 			if(board[rank][i] == NULL && checkcheck(colour, rank, file, rank, i) == false) all_moves.push_back({rank, file, rank, i});	//empty legal place to go
-			else if(board[rank][i] != NULL && board[rank][i]->colour != colour && checkcheck(colour, rank, file, rank, i) == false){	//enemy piece in the way
-				all_moves.push_back({rank, file, rank, i});
+			else if(board[rank][i] != NULL && board[rank][i]->colour != colour){	//enemy piece in the way
+				if(checkcheck(colour, rank, file, rank, i) == false) all_moves.push_back({rank, file, rank, i});
 				break;
 			}
 			else if(board[rank][i] != NULL && board[rank][i]->colour == colour) break;	//come accross a friendly piece in the way
@@ -700,8 +704,8 @@ public:
 		i = rank + 1;
 		for(i; i<8; i++){
 			if(board[i][file] == NULL && checkcheck(colour, rank, file, i, file) == false) all_moves.push_back({rank, file, i, file});	//empty legal place to go
-			else if(board[i][file] != NULL && board[i][file]->colour != colour && checkcheck(colour, rank, file, i, file) == false){	//enemy piece in the way
-				all_moves.push_back({rank, file, i, file});
+			else if(board[i][file] != NULL && board[i][file]->colour != colour){	//enemy piece in the way
+				if(checkcheck(colour, rank, file, i, file) == false) all_moves.push_back({rank, file, i, file});
 				break;
 			}
 			else if(board[i][file] != NULL && board[i][file]->colour == colour) break;	//come accross a friendly piece in the way
@@ -710,8 +714,8 @@ public:
 		i = rank - 1;
 		for(i; i>=0; i--){
 			if(board[i][file] == NULL && checkcheck(colour, rank, file, i, file) == false) all_moves.push_back({rank, file, i, file});	//empty legal place to go
-			else if(board[i][file] != NULL && board[i][file]->colour != colour && checkcheck(colour, rank, file, i, file) == false){	//enemy piece in the way
-				all_moves.push_back({rank, file, i, file});
+			else if(board[i][file] != NULL && board[i][file]->colour != colour){	//enemy piece in the way
+				if(checkcheck(colour, rank, file, i, file) == false) all_moves.push_back({rank, file, i, file}); //taking it doesnt put us in check
 				break;
 			}
 			else if(board[i][file] != NULL && board[i][file]->colour == colour) break;	//come accross a friendly piece in the way
@@ -729,7 +733,8 @@ public:
 		file = b;
 		colour = y;
 		type = queen;
-		value = 9;
+		if(colour == black) value = -975;
+		else value = 975;
 	}
 };
 
@@ -739,7 +744,7 @@ private:
 		//castling
 		if(abs(y - file) == 2 && rank == x && !checkcheck(colour) && move_count == 0){	//valid castling move and not in check and not previously moved
 			if(y < file){	//queenside 
-				if(board[rank][0]->move_count == 0){	//rook not moved
+				if(board[rank][0] != NULL && board[rank][0]->move_count == 0){	//rook not moved
 					if(board[rank][3] != NULL || checkcheck(colour, rank, file, rank, 3)) return false;	//a square in between king and rook is either filled or in check
 					if(board[rank][2] != NULL || checkcheck(colour, rank, file, rank, 2)) return false;	//a square in between king and rook is either filled or in check
 					if(board[rank][1] != NULL) return false; //path to rook not empty
@@ -747,7 +752,7 @@ private:
 				else return false;	// rook moved
 			}
 			else{		//kingside
-				if(board[rank][7]->move_count == 0){	//rook not moved
+				if(board[rank][7] != NULL && board[rank][7]->move_count == 0){	//rook not moved
 					if(board[rank][5] != NULL || checkcheck(colour, rank, file, rank, 5)) return false;	//a square in between king and rook is either filled or in check
 					if(board[rank][6] != NULL || checkcheck(colour, rank, file, rank, 6)) return false;	//a square in between king and rook is either filled or in check
 				}
@@ -818,7 +823,6 @@ public:
 	}
 	virtual bool islegal(int x, int y){
 		piece* target_piece = board[x][y];
-		//Piece specific moves
 		//normal moves
 		if(target_piece == NULL || target_piece->colour != colour){ //Check target square is either empty or has enemy piece on it
 			if(abs(rank - x) <= 1 && abs(file - y) <= 1){
@@ -830,8 +834,10 @@ public:
 	}
 	virtual vector<a_move> getmoves(bool display){
 		vector<a_move> all_moves;
+		//cout<<"Checking king moves"<<endl;
 		for(int i = rank -1; i <=rank + 1; i++){
 			for(int j = file -2; j <= file + 2; j++){
+				//cout<<"Checking square "<<i<<" "<<j<<endl;
 				if(i >= 0 && i <=7 && j>=0 && j<=7 && (islegal(i, j) || castling(i, j)) && checkcheck(colour, rank, file, i, j) == false){	
 				//If the move is a valid coordinate and is legal and does not result in check. 
 					all_moves.push_back({rank, file, i, j});
@@ -851,6 +857,7 @@ public:
 		file = b;
 		colour = y;
 		type = king;
-		value = 0;
+		if(colour == black) value = -32767;
+		else value = 32767;
 	};	
 };

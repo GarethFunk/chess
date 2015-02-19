@@ -17,7 +17,6 @@ X	-both players agree
 
 Chess Engine
 	-Board scoring
-	-Permute next possible moves
 
 
 Recording/Playback
