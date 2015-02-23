@@ -114,7 +114,7 @@ private:
 		return false;
 	}
 	bool en_passant(int x, int y){
-		if(board[rank][y] != NULL && board[rank][y]->type == pawn && board[rank][y]->move_count == 1) return true;
+		if(board[rank][y] != NULL && board[rank][y]->type == pawn && board[rank][y]->move_count == 1 && board[rank][y]->colour != colour) return true;
 		return false;
 	}
 
@@ -131,7 +131,10 @@ public:
 					if(board[x][y] != NULL) delete board[x][y];	//delete captured piece
 					board[x][y] = board[rank][file];
 					board[rank][file] = NULL;
-					if(en_passant(x, y)) delete board[rank][y];	//make en passant capture if eligible
+					if(en_passant(x, y)){
+						delete board[rank][y];	//make en passant capture if eligible
+						board[rank][y] == NULL;
+					}
 					//update piece properties
 					rank = x;
 					file = y;

@@ -16,7 +16,9 @@ X	-both players agree
 	-the same board has occurred three times with the same player to move and all pieces having the same rights to move including castling and en passant capture 
 
 Chess Engine
-	-Board scoring
+	-Improve efficiency of checkcheck & checkcheckmate
+	-investigate effects of getmoves() efficiency 
+	-look into parallel processing. 
 
 
 Recording/Playback

@@ -8,8 +8,13 @@
 #define white 0
 #define black 1
 #define ENGINE_DEPTH 3	
+#define material_weight 1
+#define position_weight 10
 
 using namespace std;
+
+const int MIN = std::numeric_limits<int>::min();
+const int MAX = std::numeric_limits<int>::max();
 
 enum types {pawn, rook, knight, bishop, queen, king};
 struct a_move {
@@ -37,8 +42,8 @@ bool checkstalemate(int colour);
 //engine functions
 bool engine_move(int colour);
 vector<a_move> get_all_moves(int colour);
-int evaluate(int colour);
-int minimax(a_move node, int depth, int colour);
+int evaluate();
+int minimax(a_move node, int depth, int alpha, int beta, int colour);
 
 //Variables
 bool turn = white; //use turn = !turn to switch //white == 0; black == 1;
@@ -298,22 +303,28 @@ bool engine_move(int colour){
 	vector<a_move> turn_moves = get_all_moves(colour);
 	int num_moves = turn_moves.size();
 	int best_move;
-	int best_value_white = std::numeric_limits<int>::min();
-	int best_value_black = std::numeric_limits<int>::max();
+	int best_value_white = MIN;
+	int best_value_black = MAX;
+	int alpha = MIN;
+	int beta = MAX;
 	for(int i = 0; i < num_moves; i++){
-		turn_moves[i].score = minimax(turn_moves[i], ENGINE_DEPTH, colour);
+		turn_moves[i].score = minimax(turn_moves[i], ENGINE_DEPTH, alpha, beta, colour);
 		cout<<"Move "<<i<<" out of "<<num_moves<<" has score "<<turn_moves[i].score<<endl;
 		if(colour == white){	//maximise
 			if(turn_moves[i].score > best_value_white){
 				best_value_white = turn_moves[i].score;
 				best_move = i;
 			}
+			if(turn_moves[i].score > alpha)	alpha = turn_moves[i].score;
+			if(beta <= alpha) break;	//beta cutoff
 		}
 		if(colour == black){	//minimise
 			if(turn_moves[i].score < best_value_black){
 				best_value_black = turn_moves[i].score;
 				best_move = i;
 			}
+			if(turn_moves[i].score < beta) beta = turn_moves[i].score;
+			if(beta <= alpha) break;
 		}
 	}	
 	//cout<<"All possible moves for your team:"<<endl;
@@ -325,7 +336,7 @@ bool engine_move(int colour){
 	board[turn_moves[best_move].rank][turn_moves[best_move].file]->do_move(turn_moves[best_move].x, turn_moves[best_move].y);
 }
 
-int minimax(a_move node, int depth, int colour){
+int minimax(a_move node, int depth, int alpha, int beta, int colour){
 	int best_value;
 	int i;
 	//make the move
@@ -339,7 +350,7 @@ int minimax(a_move node, int depth, int colour){
 	if(depth == 0){
 		//undo the move
 		//cout<<"Reached the bottom of the tree"<<endl;
-		int score = evaluate(colour);
+		int score = evaluate();
 		board[node.rank][node.file] = board[node.x][node.y];
 		board[node.x][node.y] = piece_buffer;
 		board[node.rank][node.file]->rank = node.rank;
@@ -352,7 +363,7 @@ int minimax(a_move node, int depth, int colour){
 	if(num_moves == 0){
 		//undo the move
 		//cout<<"This is a terminal node"<<endl;
-		int score = evaluate(colour);
+		int score = evaluate();
 		board[node.rank][node.file] = board[node.x][node.y];
 		board[node.x][node.y] = piece_buffer;
 		board[node.rank][node.file]->rank = node.rank;
@@ -360,13 +371,13 @@ int minimax(a_move node, int depth, int colour){
 		return score;
 	}
 	if(colour == white){
-		best_value = std::numeric_limits<int>::max();
+		best_value = MIN;
 		for(i = 0; i<num_moves; i++){
 			//cout<<"Calling minimax at depth "<<depth<<" move "<<i+1<<" of "<<num_moves<<" for white"<<endl;
-			int val = minimax(turn_moves[i], depth-1, black);
-			if(val < best_value){
-				best_value = val;
-			}
+			int val = minimax(turn_moves[i], depth-1, alpha, beta, black);
+			if(val > best_value) best_value = val;
+			if(val > alpha)	alpha = val;
+			if(beta <= alpha) break;	//beta cutoff
 		}
 		//undo the move
 		board[node.rank][node.file] = board[node.x][node.y];
@@ -376,13 +387,13 @@ int minimax(a_move node, int depth, int colour){
 		return best_value;
 	}
 	else{
-		best_value = std::numeric_limits<int>::min();
+		best_value = MAX;
 		for(i = 0; i<num_moves; i++){
 			//cout<<"Calling minimax at depth "<<depth<<" move "<<i+1<<" of "<<num_moves<<" for black"<<endl;
-			int val = minimax(turn_moves[i], depth-1, white);
-			if(val > best_value){
-				best_value = val;
-			}
+			int val = minimax(turn_moves[i], depth-1, alpha, beta, white);
+			if(val < best_value) best_value = val;
+			if(val < beta) beta = val;
+			if(beta <= alpha) break;
 		}
 		//undo the move
 		board[node.rank][node.file] = board[node.x][node.y];
@@ -408,54 +419,69 @@ vector<a_move> get_all_moves(int colour){
 	return turn_moves;
 }
 
-int evaluate(int colour){
+int evaluate(){
 	int score = 0;
-	int r, f;
 	for(int i = 0; i < 8; i++){
 		for(int j = 0; j < 8; j++){
 			if(board[i][j] != NULL){
 				//Caclulate material value
-				score += board[i][j]->value;
+				score += material_weight*board[i][j]->value;
 				//cout<<"Piece worth "<<board[i][j]->value<<endl;
 				//calculate position value
 				if(board[i][j]->colour == black){
 					//switch coordinates for position value lookup
-					r = 7-i;
-					f = j;
+					int r = 7-i;
+					switch(board[i][j]->type){
+						case pawn :
+							score -= position_weight*pawn_table[r][j];
+							break;
+						case knight :
+							score -= position_weight*knight_table[r][j];
+							break;
+						case bishop :
+							score -= position_weight*bishop_table[r][j];
+							break;
+						case king :
+							score -= position_weight*king_table[r][j];
+							break;
+						default:
+							break;
+					}
 				}
-				else{
-					r = i;
-					f = j;
+				else{		//if white
+					switch(board[i][j]->type){
+						case pawn :
+							score += position_weight*pawn_table[i][j];
+							break;
+						case knight :
+							score += position_weight*knight_table[i][j];
+							break;
+						case bishop :
+							score += position_weight*bishop_table[i][j];
+							break;
+						case king :
+							score += position_weight*king_table[i][j];
+							break;
+						default:
+							break;
+					}
 				}
-				int position = 0;
-				switch(board[i][j]->type){
-					case pawn :
-						position = pawn_table[r][f];
-						break;
-					case knight :
-						position = knight_table[r][f];
-						break;
-					case bishop :
-						position = bishop_table[r][f];
-						break;
-					case king :
-						position = king_table[r][f];
-						break;
-					default:
-						break;
-				}
-				//cout<<"Piece position = "<<position<<endl;
-				if(board[i][j]->colour == black) score -= position;
-				else score += position;
-				//mobility
 
+				//mobility
 				//bonuses
+				if(checkcheck(white)){
+					score -= 250;
+					if(checkcheckmate(white)) score -= 10000;
+				}
+				else if(checkcheck(black)){
+					score +=250;
+					if(checkcheckmate(black)) score -= 10000;
+				}
 
 			}
 		}			
 	}
 	return score;
-
 }
 
 

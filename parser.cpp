@@ -63,7 +63,7 @@ int parse(string input){	//return states: -1 = quit game; 0 = failed to parse an
 		engine_move(turn);
 	}
 	else if(command == "score"){
-		cout<<"Score is "<<evaluate(turn)<<endl;
+		cout<<"Score is "<<evaluate()<<endl;
 	}
 	else if(command == "almv"){
 		vector<a_move> turn_moves = get_all_moves(turn);
